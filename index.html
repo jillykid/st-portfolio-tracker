@@ -297,110 +297,6 @@
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
         
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            z-index: 1000;
-            backdrop-filter: blur(4px);
-        }
-        
-        .modal-content {
-            background: white;
-            border-radius: 20px;
-            padding: 35px;
-            max-width: 600px;
-            margin: 30px auto;
-            box-shadow: 0 25px 80px rgba(0, 0, 0, 0.3);
-            max-height: 90vh;
-            overflow-y: auto;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #4a5568;
-        }
-        
-        input, select, textarea {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-        
-        input:focus, select:focus, textarea:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-        
-        .delmal-selector {
-            border: 2px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 15px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        
-        .delmal-checkbox {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px;
-            margin-bottom: 8px;
-            border-radius: 6px;
-            transition: background 0.2s ease;
-        }
-        
-        .delmal-checkbox:hover {
-            background: #f7fafc;
-        }
-        
-        .delmal-checkbox input {
-            width: auto;
-            margin: 0;
-        }
-        
-        .form-actions {
-            display: flex;
-            gap: 15px;
-            justify-content: flex-end;
-            margin-top: 30px;
-        }
-        
-        .btn-secondary {
-            background: #e2e8f0;
-            color: #4a5568;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 10px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-secondary:hover {
-            background: #cbd5e0;
-        }
-        
         .sync-status {
             background: rgba(72, 187, 120, 0.1);
             border: 1px solid #48bb78;
@@ -429,6 +325,11 @@
             flex: 1;
         }
         
+        .filter-row .add-btn {
+            margin: 0;
+            flex-shrink: 0;
+        }
+        
         @media (max-width: 1024px) {
             .dashboard {
                 grid-template-columns: 1fr;
@@ -446,10 +347,6 @@
             
             h1 {
                 font-size: 2rem;
-            }
-            
-            .form-row {
-                grid-template-columns: 1fr;
             }
         }
     </style>
@@ -477,107 +374,15 @@
                 <div class="main-content">
                     <h2 style="margin-bottom: 20px; color: #4a5568;">Senaste Aktiviteter</h2>
                     
-                    <div class="activity-list">
-                        <div class="activity-item">
-                            <div class="activity-type kursintyg">Kursintyg</div>
-                            <div class="activity-title">Psykiatri Grundkurs</div>
-                            <div class="activity-meta">
-                                <div class="activity-date">📅 2025-05-20</div>
-                                <div class="activity-assessor">👨‍⚕️ Dr. Andersson</div>
-                            </div>
-                            <div class="delmal-tags">
-                                <span class="delmal-tag">A1</span>
-                                <span class="delmal-tag">B1</span>
-                                <span class="delmal-tag">C1</span>
-                            </div>
-                        </div>
-
-                        <div class="activity-item">
-                            <div class="activity-type klinisk">Klinisk tjänstgöring</div>
-                            <div class="activity-title">Psykiatriska kliniken - 6 månader</div>
-                            <div class="activity-meta">
-                                <div class="activity-date">📅 2025-06-01</div>
-                                <div class="activity-assessor">👩‍⚕️ Dr. Johansson</div>
-                            </div>
-                            <div class="delmal-tags">
-                                <span class="delmal-tag">B1</span>
-                                <span class="delmal-tag">C1</span>
-                                <span class="delmal-tag">C3</span>
-                                <span class="delmal-tag">C4</span>
-                            </div>
-                        </div>
-
-                        <div class="activity-item">
-                            <div class="activity-type sit-in">Sit-in</div>
-                            <div class="activity-title">Rättspsykiatrisk klinik</div>
-                            <div class="activity-meta">
-                                <div class="activity-date">📅 2025-03-22</div>
-                                <div class="activity-assessor">👨‍⚕️ Dr. Lindqvist</div>
-                            </div>
-                            <div class="delmal-tags">
-                                <span class="delmal-tag">C10</span>
-                                <span class="delmal-tag">A6</span>
-                            </div>
-                        </div>
+                    <div class="activity-list" id="overview-activities">
+                        <div style="text-align: center; padding: 20px;">Laddar senaste aktiviteter...</div>
                     </div>
                 </div>
 
                 <div class="sidebar">
                     <h3 style="margin-bottom: 20px; color: #4a5568;">Delmål Progress</h3>
-                    
-                    <div class="delmal-item completed">
-                        <div class="delmal-code">A3</div>
-                        <div class="delmal-title">Vårdhygien o smittskydd</div>
-                        <div class="delmal-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 100%;"></div>
-                            </div>
-                            <div class="progress-text">3/3</div>
-                        </div>
-                    </div>
-
-                    <div class="delmal-item">
-                        <div class="delmal-code">B1</div>
-                        <div class="delmal-title">Kommunikation med patienter och närstående</div>
-                        <div class="delmal-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 80%;"></div>
-                            </div>
-                            <div class="progress-text">4/5</div>
-                        </div>
-                    </div>
-
-                    <div class="delmal-item">
-                        <div class="delmal-code">C1</div>
-                        <div class="delmal-title">Vanliga och viktiga psykiska sjukdomar</div>
-                        <div class="delmal-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 63%;"></div>
-                            </div>
-                            <div class="progress-text">5/8</div>
-                        </div>
-                    </div>
-
-                    <div class="delmal-item">
-                        <div class="delmal-code">C4</div>
-                        <div class="delmal-title">Psykofarmakologisk och elektrokonvulsiv behandling</div>
-                        <div class="delmal-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 67%;"></div>
-                            </div>
-                            <div class="progress-text">4/6</div>
-                        </div>
-                    </div>
-
-                    <div class="delmal-item">
-                        <div class="delmal-code">C8</div>
-                        <div class="delmal-title">Utvecklingsrelaterade psykiska sjukdomar, barnpsykiatri</div>
-                        <div class="delmal-progress">
-                            <div class="progress-bar">
-                                <div class="progress-fill" style="width: 0%;"></div>
-                            </div>
-                            <div class="progress-text">0/3</div>
-                        </div>
+                    <div id="overview-sidebar-content">
+                        <div style="text-align: center; padding: 20px;">Laddar progress...</div>
                     </div>
                 </div>
             </div>
@@ -586,13 +391,14 @@
         <!-- Activities Tab -->
         <div id="activities" class="tab-content">
             <div class="main-content">
-                <button class="add-btn" onclick="openModal('activityModal')">
-                    + Lägg till aktivitet
-                </button>
+                <div style="background: #ebf4ff; border: 1px solid #3182ce; color: #2c5282; padding: 20px; border-radius: 12px; margin-bottom: 25px;">
+                    <h3 style="margin: 0 0 10px 0;">📝 Lägg till aktiviteter</h3>
+                    <p style="margin: 0;">Lägg till nya aktiviteter direkt i din <a href="https://docs.google.com/spreadsheets" target="_blank" style="color: #3182ce; font-weight: 600;">Google Sheets</a>. Uppdateringar visas automatiskt här när du uppdaterar sidan.</p>
+                </div>
 
                 <div class="filter-section">
                     <div class="filter-row">
-                        <select id="typeFilter">
+                        <select id="typeFilter" onchange="applyFilters()">
                             <option value="">Alla aktivitetstyper</option>
                             <option value="kursintyg">Kursintyg</option>
                             <option value="klinisk">Klinisk tjänstgöring</option>
@@ -600,7 +406,7 @@
                             <option value="evaluation-360">360° Utvärdering</option>
                             <option value="annat">Annat</option>
                         </select>
-                        <select id="delmalFilter">
+                        <select id="delmalFilter" onchange="applyFilters()">
                             <option value="">Alla delmål</option>
                             <optgroup label="A-serien: Allmänna kompetenser">
                                 <option value="A1">A1 - Medarbetarskap, ledarskap o pedagogik</option>
@@ -633,11 +439,9 @@
                                 <option value="C13">C13 - Myndigheters regelverk</option>
                             </optgroup>
                         </select>
-                        <select id="assessorFilter">
-                            <option value="">Alla bedömare</option>
-                            <option value="Dr. Andersson">Dr. Andersson</option>
-                            <option value="Dr. Johansson">Dr. Johansson</option>
-                        </select>
+                        <button class="add-btn" onclick="clearFilters()" style="padding: 8px 16px; font-size: 0.9rem;">
+                            🗑️ Rensa filter
+                        </button>
                     </div>
                 </div>
 
@@ -655,159 +459,6 @@
                     <!-- Delmål will be populated here -->
                 </div>
             </div>
-        </div>
-    </div>
-
-    <!-- Add Activity Modal -->
-    <div id="activityModal" class="modal">
-        <div class="modal-content">
-            <h2 style="margin-bottom: 25px; color: #4a5568;">Lägg till ny aktivitet</h2>
-            <form>
-                <div class="form-group">
-                    <label for="activityTitle">Aktivitetstitel</label>
-                    <input type="text" id="activityTitle" placeholder="T.ex. Allmänmedicin Grundkurs">
-                </div>
-                
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="activityType">Typ av aktivitet</label>
-                        <select id="activityType">
-                            <option value="kursintyg">Kursintyg</option>
-                            <option value="klinisk">Intyg för klinisk tjänstgöring</option>
-                            <option value="sit-in">Sit-in</option>
-                            <option value="evaluation-360">360° Utvärdering</option>
-                            <option value="annat">Annat</option>
-                        </select>
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="activityDate">Datum</label>
-                        <input type="date" id="activityDate">
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="activityAssessor">Ansvarig bedömare</label>
-                    <input type="text" id="activityAssessor" placeholder="T.ex. Dr. Andersson">
-                </div>
-                
-                <div class="form-group">
-                    <label>Relaterade delmål</label>
-                    <div class="delmal-selector" id="delmalSelector">
-                        <div style="font-weight: 600; color: #667eea; margin: 10px 0 8px 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px;">A-serien: Allmänna kompetenser</div>
-                        <div class="delmal-checkbox">
-                            <input type="checkbox" id="delmal_a1" value="A1">
-                            <label for="delmal_a1">A1 - Medarbetarskap, ledarskap o pedagogik</label>
-                        </div>
-                        <div class="delmal-checkbox">
-                            <input type="checkbox" id="delmal_a2" value="A2">
-                            <label for="delmal_a2">A2 - Etik, mångfald o jämlikhet</label>
-                        </div>
-                        <div class="delmal-checkbox">
-                            <input type="checkbox" id="delmal_a3" value="A3">
-                            <label for="delmal_a3">A3 - Vårdhygien o smittskydd</label>
-                        </div>
-                        <div class="delmal-checkbox">
-                            <input type="checkbox" id="delmal_a4" value="A4">
-                            <label for="delmal_a4">A4 - Systematiskt kvalitets- o patientsäkerhetsarbete</label>
-                        </div>
-                        <div class="delmal-checkbox">
-                            <input type="checkbox" id="delmal_a5" value="A5">
-                            <label for="delmal_a5">A5 - Medicinsk vetenskap</label>
-                        </div>
-                        <div class="delmal-checkbox">
-                            <input type="checkbox" id="delmal_a6" value="A6">
-                            <label for="delmal_a6">A6 - Lagar och andra föreskrifter samt hälso- och sjukvårdens organisation</label>
-                        </div>
-                        
-                        <div style="font-weight: 600; color: #667eea; margin: 15px 0 8px 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px;">B-serien: Patientvård grundläggande</div>
-                        <div class="delmal-checkbox">
-                            <input type="checkbox" id="delmal_b1" value="B1">
-                            <label for="delmal_b1">B1 - Kommunikation med patienter och närstående</label>
-                        </div>
-                        <div class="delmal-checkbox">
-                            <input type="checkbox" id="delmal_b2" value="B2">
-                            <label for="delmal_b2">B2 - Sjukdomsförebyggande arbete</label>
-                        </div>
-                        <div class="delmal-checkbox">
-                            <input type="checkbox" id="delmal_b3" value="B3">
-                            <label for="delmal_b3">B3 - Läkemedel</label>
-                        </div>
-                        <div class="delmal-checkbox">
-                            <input type="checkbox" id="delmal_b4" value="B4">
-                            <label for="delmal_b4">B4 - Försäkringsmedicin</label>
-                        </div>
-                        <div class="delmal-checkbox">
-                            <input type="checkbox" id="delmal_b5" value="B5">
-                            <label for="delmal_b5">B5 - Palliativ vård i livets slutskede</label>
-                        </div>
-                        
-                        <div style="font-weight: 600; color: #667eea; margin: 15px 0 8px 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px;">C-serien: Psykiatrispecifika kompetenser</div>
-                        <div class="delmal-checkbox">
-                            <input type="checkbox" id="delmal_c1" value="C1">
-                            <label for="delmal_c1">C1 - Vanliga och viktiga psykiska sjukdomar med betoning på de stora folksjukdomarna</label>
-                        </div>
-                        <div class="delmal-checkbox">
-                            <input type="checkbox" id="delmal_c2" value="C2">
-                            <label for="delmal_c2">C2 - Övriga psykiska sjukdomar</label>
-                        </div>
-                        <div class="delmal-checkbox">
-                            <input type="checkbox" id="delmal_c3" value="C3">
-                            <label for="delmal_c3">C3 - Akutpsykiatriska tillstånd samt katastrofpsykiatriska situationer</label>
-                        </div>
-                        <div class="delmal-checkbox">
-                            <input type="checkbox" id="delmal_c4" value="C4">
-                            <label for="delmal_c4">C4 - Psykofarmakologisk och elektrokonvulsiv behandling</label>
-                        </div>
-                        <div class="delmal-checkbox">
-                            <input type="checkbox" id="delmal_c5" value="C5">
-                            <label for="delmal_c5">C5 - Differentialdiagnostik, handlägga somatiska tillstånd (intermed, neurologiska)</label>
-                        </div>
-                        <div class="delmal-checkbox">
-                            <input type="checkbox" id="delmal_c6" value="C6">
-                            <label for="delmal_c6">C6 - Substansberoendetillstånd</label>
-                        </div>
-                        <div class="delmal-checkbox">
-                            <input type="checkbox" id="delmal_c7" value="C7">
-                            <label for="delmal_c7">C7 - Neurodegenerativa, demens sjukdomar & kognitiv störning</label>
-                        </div>
-                        <div class="delmal-checkbox">
-                            <input type="checkbox" id="delmal_c8" value="C8">
-                            <label for="delmal_c8">C8 - Utvecklingsrelaterade psykiska sjukdomar, barnpsykiatri</label>
-                        </div>
-                        <div class="delmal-checkbox">
-                            <input type="checkbox" id="delmal_c9" value="C9">
-                            <label for="delmal_c9">C9 - Teoretiska grunderna för de olika psykologiska behandlingsmetoderna</label>
-                        </div>
-                        <div class="delmal-checkbox">
-                            <input type="checkbox" id="delmal_c10" value="C10">
-                            <label for="delmal_c10">C10 - Lagar och andra föreskrifter, rättspsykiatrin</label>
-                        </div>
-                        <div class="delmal-checkbox">
-                            <input type="checkbox" id="delmal_c11" value="C11">
-                            <label for="delmal_c11">C11 - Kognitiva funktionshinder, testmetoder</label>
-                        </div>
-                        <div class="delmal-checkbox">
-                            <input type="checkbox" id="delmal_c12" value="C12">
-                            <label for="delmal_c12">C12 - Ha kunskap om samordning och uppföljning av patienter, brukarorganisationers roll</label>
-                        </div>
-                        <div class="delmal-checkbox">
-                            <input type="checkbox" id="delmal_c13" value="C13">
-                            <label for="delmal_c13">C13 - Ha kunskap relevanta myndigheters regelverk och kunna tillämpa lagar och andra föreskrifter</label>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="activityNotes">Anteckningar</label>
-                    <textarea id="activityNotes" rows="3" placeholder="Fritext anteckningar om aktiviteten..."></textarea>
-                </div>
-                
-                <div class="form-actions">
-                    <button type="button" class="btn-secondary" onclick="closeModal('activityModal')">Avbryt</button>
-                    <button type="button" class="add-btn" onclick="addActivity()">Spara aktivitet</button>
-                </div>
-            </form>
         </div>
     </div>
 
@@ -835,29 +486,6 @@
             } catch (error) {
                 console.error('API Error:', error);
                 showError('Fel vid hämtning av data från Google Sheets');
-                return null;
-            }
-        }
-        
-        async function postToAPI(action, data) {
-            try {
-                const response = await fetch(`${API_BASE_URL}?action=${action}`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(data)
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                
-                const result = await response.json();
-                return result;
-            } catch (error) {
-                console.error('API Error:', error);
-                showError('Fel vid sparande till Google Sheets');
                 return null;
             }
         }
@@ -923,6 +551,7 @@
                 }
             }, 3000);
         }
+
         // =============================================================================
         // TAB SWITCHING & LOADING FUNCTIONS
         // =============================================================================
@@ -961,12 +590,91 @@
             container.innerHTML = '';
             
             if (activities && activities.length > 0) {
-                activities.forEach(activity => {
-                    const activityEl = createActivityElement(activity);
-                    container.appendChild(activityEl);
-                });
+                // Store activities globally for filtering
+                currentActivities = activities;
+                renderActivities(activities);
             } else {
-                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #718096;">Inga aktiviteter finns ännu. Lägg till din första aktivitet!</div>';
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #718096;">Inga aktiviteter finns ännu. Lägg till din första aktivitet i Google Sheets!</div>';
+            }
+        }
+
+        // Render activities (used for both initial load and filtering)
+        function renderActivities(activities) {
+            const container = document.getElementById('activityList');
+            container.innerHTML = '';
+            
+            if (activities.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #718096;">Inga aktiviteter matchar de valda filtren.</div>';
+                return;
+            }
+            
+            activities.forEach(activity => {
+                const activityEl = createActivityElement(activity);
+                container.appendChild(activityEl);
+            });
+        }
+
+        // Apply filters to activities
+        function applyFilters() {
+            const typeFilter = document.getElementById('typeFilter').value;
+            const delmalFilter = document.getElementById('delmalFilter').value;
+            
+            let filteredActivities = currentActivities;
+            
+            // Filter by type
+            if (typeFilter) {
+                filteredActivities = filteredActivities.filter(activity => 
+                    activity.type === typeFilter
+                );
+            }
+            
+            // Filter by delmål
+            if (delmalFilter) {
+                filteredActivities = filteredActivities.filter(activity => 
+                    activity.delmal && activity.delmal.includes(delmalFilter)
+                );
+            }
+            
+            renderActivities(filteredActivities);
+            
+            // Show filter status
+            const total = currentActivities.length;
+            const filtered = filteredActivities.length;
+            
+            if (typeFilter || delmalFilter) {
+                showFilterStatus(filtered, total);
+            } else {
+                hideFilterStatus();
+            }
+        }
+
+        // Clear all filters
+        function clearFilters() {
+            document.getElementById('typeFilter').value = '';
+            document.getElementById('delmalFilter').value = '';
+            renderActivities(currentActivities);
+            hideFilterStatus();
+        }
+
+        // Show filter status message
+        function showFilterStatus(filtered, total) {
+            let statusDiv = document.getElementById('filter-status');
+            if (!statusDiv) {
+                statusDiv = document.createElement('div');
+                statusDiv.id = 'filter-status';
+                statusDiv.style.cssText = 'background: #ebf4ff; border: 1px solid #3182ce; color: #2c5282; padding: 10px; border-radius: 8px; margin-bottom: 15px; text-align: center; font-size: 0.9rem;';
+                
+                const activityList = document.getElementById('activityList');
+                activityList.parentNode.insertBefore(statusDiv, activityList);
+            }
+            statusDiv.innerHTML = `📊 Visar ${filtered} av ${total} aktiviteter`;
+        }
+
+        // Hide filter status message
+        function hideFilterStatus() {
+            const statusDiv = document.getElementById('filter-status');
+            if (statusDiv) {
+                statusDiv.remove();
             }
         }
 
@@ -990,19 +698,13 @@
 
         // Load overview sidebar with real data
         async function loadOverviewSidebar() {
-            const container = document.querySelector('.sidebar');
+            const container = document.getElementById('overview-sidebar-content');
             if (!container) return;
             
-            // Keep the header
-            const header = container.querySelector('h3');
             container.innerHTML = '<div style="text-align: center; padding: 20px;">Laddar progress...</div>';
             
             const delmalProgress = await loadDelmalProgress();
             container.innerHTML = '';
-            
-            if (header) {
-                container.appendChild(header);
-            }
             
             if (delmalProgress && delmalProgress.length > 0) {
                 // Show top 5 delmål with most progress or that are completed
@@ -1021,12 +723,14 @@
                     const delmalEl = createDelmalElement(delmal);
                     container.appendChild(delmalEl);
                 });
+            } else {
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #718096;">Kunde inte ladda delmål progress.</div>';
             }
         }
 
         // Load recent activities for overview
         async function loadRecentActivities() {
-            const container = document.querySelector('#overview .activity-list');
+            const container = document.getElementById('overview-activities');
             if (!container) return;
             
             container.innerHTML = '<div style="text-align: center; padding: 20px;">Laddar senaste aktiviteter...</div>';
@@ -1045,7 +749,7 @@
                     container.appendChild(activityEl);
                 });
             } else {
-                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #718096;">Inga aktiviteter finns ännu.</div>';
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #718096;">Inga aktiviteter finns ännu. Lägg till din första i Google Sheets!</div>';
             }
         }
 
@@ -1097,154 +801,6 @@
             `;
             
             return div;
-        }
-
-        // Modal functions with real data loading
-        async function openModal(modalId) {
-            if (modalId === 'activityModal') {
-                // Load current delmål data for the checkboxes
-                await updateDelmalSelector();
-            }
-            document.getElementById(modalId).style.display = 'block';
-        }
-        
-        async function updateDelmalSelector() {
-            const selector = document.getElementById('delmalSelector');
-            selector.innerHTML = '<div style="text-align: center; padding: 20px;">Laddar delmål...</div>';
-            
-            const delmalData = await loadDelmalData();
-            
-            if (delmalData && delmalData.length > 0) {
-                // Group by category
-                const grouped = delmalData.reduce((groups, delmal) => {
-                    const category = delmal.category;
-                    if (!groups[category]) {
-                        groups[category] = [];
-                    }
-                    groups[category].push(delmal);
-                    return groups;
-                }, {});
-                
-                const categoryNames = {
-                    'A': 'A-serien: Allmänna kompetenser',
-                    'B': 'B-serien: Patientvård grundläggande', 
-                    'C': 'C-serien: Psykiatrispecifika kompetenser'
-                };
-                
-                selector.innerHTML = '';
-                
-                Object.keys(grouped).sort().forEach(category => {
-                    // Add category header
-                    const header = document.createElement('div');
-                    header.style.cssText = 'font-weight: 600; color: #667eea; margin: 15px 0 8px 0; border-bottom: 1px solid #e2e8f0; padding-bottom: 4px;';
-                    header.textContent = categoryNames[category] || category;
-                    if (category === 'A') header.style.marginTop = '10px';
-                    selector.appendChild(header);
-                    
-                    // Add checkboxes for this category
-                    grouped[category].forEach(delmal => {
-                        const checkboxDiv = document.createElement('div');
-                        checkboxDiv.className = 'delmal-checkbox';
-                        
-                        const checkbox = document.createElement('input');
-                        checkbox.type = 'checkbox';
-                        checkbox.id = `delmal_${delmal.code.toLowerCase()}`;
-                        checkbox.value = delmal.code;
-                        
-                        const label = document.createElement('label');
-                        label.htmlFor = checkbox.id;
-                        label.textContent = `${delmal.code} - ${delmal.title}`;
-                        
-                        checkboxDiv.appendChild(checkbox);
-                        checkboxDiv.appendChild(label);
-                        selector.appendChild(checkboxDiv);
-                    });
-                });
-            } else {
-                selector.innerHTML = '<div style="color: #e53e3e; text-align: center; padding: 20px;">Kunde inte ladda delmål. Kontrollera din anslutning.</div>';
-            }
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-
-        // Close modal when clicking outside
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal')) {
-                event.target.style.display = 'none';
-            }
-        }
-
-        // Add activity function - now saves to Google Sheets!
-        async function addActivity() {
-            const title = document.getElementById('activityTitle').value;
-            const type = document.getElementById('activityType').value;
-            const date = document.getElementById('activityDate').value;
-            const assessor = document.getElementById('activityAssessor').value;
-            const notes = document.getElementById('activityNotes').value;
-            
-            // Validation
-            if (!title || !type || !date || !assessor) {
-                showError('Vänligen fyll i alla obligatoriska fält (titel, typ, datum, bedömare)');
-                return;
-            }
-            
-            // Get selected delmål
-            const selectedDelmal = [];
-            document.querySelectorAll('#delmalSelector input[type="checkbox"]:checked').forEach(checkbox => {
-                selectedDelmal.push(checkbox.value);
-            });
-            
-            if (selectedDelmal.length === 0) {
-                showError('Vänligen välj minst ett delmål för denna aktivitet');
-                return;
-            }
-            
-            const activity = {
-                title,
-                type,
-                date,
-                assessor,
-                delmal: selectedDelmal,
-                notes: notes || ''
-            };
-            
-            // Show loading state
-            const saveBtn = document.querySelector('#activityModal .add-btn');
-            const originalText = saveBtn.textContent;
-            saveBtn.textContent = 'Sparar...';
-            saveBtn.disabled = true;
-            
-            // Save to Google Sheets
-            const result = await postToAPI('addAktivitet', activity);
-            
-            // Reset button state
-            saveBtn.textContent = originalText;
-            saveBtn.disabled = false;
-            
-            if (result && result.success) {
-                showSuccess('Aktivitet sparad till Google Sheets!');
-                closeModal('activityModal');
-                
-                // Reset form
-                document.getElementById('activityTitle').value = '';
-                document.getElementById('activityNotes').value = '';
-                document.getElementById('activityDate').value = '';
-                document.getElementById('activityAssessor').value = '';
-                document.querySelectorAll('#delmalSelector input[type="checkbox"]').forEach(cb => cb.checked = false);
-                
-                // Refresh current view
-                const activeTab = document.querySelector('.tab.active').onclick.toString().match(/switchTab\('(.+?)'\)/)[1];
-                if (activeTab === 'activities') {
-                    await loadActivitiesTab();
-                } else if (activeTab === 'overview') {
-                    await loadRecentActivities();
-                    await loadOverviewSidebar();
-                }
-            } else {
-                showError('Fel vid sparande. Försök igen.');
-            }
         }
 
         // Initialize on page load with real data
