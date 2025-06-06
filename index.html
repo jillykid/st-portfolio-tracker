@@ -105,6 +105,14 @@
 
       const badgeColor = statusColor[validatedStatus] || "#ccc";
 
+      const completedActivities = (delmal.completed_activities || [])
+        .map(act => `
+          <li>
+            ${act.type}: <strong>${act.title}</strong> (${new Date(act.date).toLocaleDateString('sv-SE')})<br/>
+            ${act.assessor ? 'Bedömd av: ' + act.assessor + '<br/>' : ''}
+            ${act.notes || ''}
+          </li>`).join('');
+
       div.className = `delmal-item ${validatedStatus === 'Avklarat' ? 'completed' : ''}`;
       div.innerHTML = `
         <div class="delmal-code">${delmal.code}</div>
@@ -120,6 +128,8 @@
             </span>
           </div>
         </div>
+        ${completedActivities ? `<ul style="margin-top:10px; font-size: 0.9rem; color:#4a5568;">${completedActivities}</ul>` : ''}
+        ${delmal.manual_status && delmal.manual_status.trim() !== validatedStatus ? `<div style="margin-top: 6px; font-size: 0.8rem; color: #718096;"><em>Observera: Manuell status (\"${delmal.manual_status}\") skiljer sig från beräknad status.</em></div>` : ''}
       `;
       return div;
     }
