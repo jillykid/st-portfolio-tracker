@@ -45,3 +45,68 @@
     .note {
       font-size: 0.9rem;
       color: #666;
+      margin-top: 1rem;
+    }
+    .error-message {
+      color: red;
+      margin-top: 1rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>ST Residency Tracker</h1>
+    <p>Overview of Courses, Clinical Placements, Competencies & Goals</p>
+  </header>
+  <main>
+    <h2>Live Google Sheet</h2>
+    <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTIFShDloT0vTYCfl_bKrS3hwhndQGyqZo2o1sKOXAiAAyIjA6LyOYeISomSwJzEaGdt4SKCDzWsCa3/pubhtml?widget=true&amp;headers=false"></iframe>
+    <p class="note">This view is read-only. Edit directly in the Google Sheet for updates to reflect here.</p>
+
+    <h2>Linked Documents</h2>
+    <div id="error" class="error-message"></div>
+    <table id="docsTable">
+      <thead>
+        <tr>
+          <th>Category</th>
+          <th>Title</th>
+          <th>Link</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Populated via JavaScript -->
+      </tbody>
+    </table>
+  </main>
+
+  <script>
+    fetch('https://script.google.com/macros/s/AKfycbzVYgQs8fs09drBk3SY6HZeULL9DxCBq3MBWJO_2nENNg_XK3pUzMwSZwsvRUB0O1ZwXg/exec')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        if (!Array.isArray(data)) {
+          throw new Error("Unexpected data format. Expected an array.");
+        }
+        const tbody = document.querySelector("#docsTable tbody");
+        tbody.innerHTML = "";
+        data.forEach(row => {
+          const tr = document.createElement("tr");
+          tr.innerHTML = `
+            <td>${row.Category || ''}</td>
+            <td>${row.Title || ''}</td>
+            <td><a href="${row.DriveLink}" target="_blank">View</a></td>
+          `;
+          tbody.appendChild(tr);
+        });
+      })
+      .catch(err => {
+        document.getElementById("error").textContent = `Error loading documents: ${err.message}`;
+        console.error("Error loading documents:", err);
+      });
+  </script>
+</body>
+</html>
