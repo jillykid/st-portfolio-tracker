@@ -1,152 +1,47 @@
 <!DOCTYPE html>
-<html lang="sv">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ST Portfolio - Delmål & Aktiviteter</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ST Residency Tracker</title>
   <style>
-    /* Keep your existing CSS styles */
-  </style>
-</head>
-<body>
-  <div class="container">
-    <header>
-      <h1>🏥 ST Portfolio</h1>
-      <p class="subtitle">Spåra dina delmål och dokumenterade aktiviteter</p>
-    </header>
-
-    <div class="sync-status">
-      🔄 Ansluter till Google Sheets...
-    </div>
-
-    <div class="tabs">
-      <div class="tab active" onclick="switchTab('overview')">📊 Översikt</div>
-      <div class="tab" onclick="switchTab('activities')">📋 Aktiviteter</div>
-      <div class="tab" onclick="switchTab('delmal')">🎯 Delmål</div>
-    </div>
-
-    <div id="overview" class="tab-content active">
-      <div class="dashboard">
-        <div class="main-content">
-          <h2 style="margin-bottom: 20px; color: #4a5568;">Senaste Aktiviteter</h2>
-          <div class="activity-list" id="overview-activities"></div>
-        </div>
-        <div class="sidebar">
-          <h3 style="margin-bottom: 20px; color: #4a5568;">Delmål Progress</h3>
-          <div id="overview-sidebar-content"></div>
-        </div>
-      </div>
-    </div>
-
-    <div id="activities" class="tab-content">
-      <div class="main-content">
-        <div class="activity-list" id="activityList"></div>
-      </div>
-    </div>
-
-    <div id="delmal" class="tab-content">
-      <div class="main-content">
-        <h2 style="margin-bottom: 20px; color: #4a5568;">Alla Delmål</h2>
-        <div id="delmalList"></div>
-      </div>
-    </div>
-  </div>
-
-  <script>
-    const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbw20mqd5nIjXCDogGeRIj_3Gmx5FdSO6lh2EGzY3UhzlH8qCJRoji18MdlAOsd067GYjg/exec';
-
-    async function fetchFromAPI(action) {
-      try {
-        const response = await fetch(`${API_BASE_URL}?action=${action}`);
-        return await response.json();
-      } catch (error) {
-        console.error('API error:', error);
-        return null;
-      }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f4f4f4;
     }
-
-    async function switchTab(tabName) {
-      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-      document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
-      document.getElementById(tabName).classList.add('active');
-      event.target.classList.add('active');
-
-      if (tabName === 'delmal') await loadDelmalTab();
+    header {
+      background-color: #007acc;
+      color: white;
+      padding: 1rem;
+      text-align: center;
     }
-
-    async function loadDelmalTab() {
-      const container = document.getElementById('delmalList');
-      container.innerHTML = '<div style="text-align:center; padding:20px;">Laddar delmål...</div>';
-
-      const data = await fetchFromAPI('getDelmalProgress');
-      container.innerHTML = '';
-
-      if (!data || data.length === 0) {
-        container.innerHTML = '<div style="text-align:center; padding:40px; color:#718096;">Kunde inte ladda delmål data.</div>';
-        return;
-      }
-
-      data.forEach(delmal => {
-        const el = createDelmalElement(delmal);
-        container.appendChild(el);
-      });
+    main {
+      max-width: 1000px;
+      margin: 2rem auto;
+      background: white;
+      padding: 2rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
     }
-
-    function createDelmalElement(delmal) {
-      const div = document.createElement('div');
-
-      const progress = delmal.progress ?? 0;
-      const validatedStatus = delmal.validated_status || "Ej genomfört";
-      const statusColor = {
-        "Avklarat": "#48bb78",
-        "Delvis genomfört": "#f6ad55",
-        "Ej genomfört": "#f56565"
-      };
-
-      const badgeColor = statusColor[validatedStatus] || "#ccc";
-
-      const completedActivities = (delmal.completed_activities || [])
-        .map(act => `
-          <li>
-            ${act.type}: <strong>${act.title}</strong> (${new Date(act.date).toLocaleDateString('sv-SE')})<br/>
-            ${act.assessor ? 'Bedömd av: ' + act.assessor + '<br/>' : ''}
-            ${act.notes || ''}
-          </li>`).join('');
-
-      div.className = `delmal-item ${validatedStatus === 'Avklarat' ? 'completed' : ''}`;
-      div.innerHTML = `
-        <div class="delmal-code">${delmal.code}</div>
-        <div class="delmal-title">${delmal.title}</div>
-        <div class="delmal-progress">
-          <div class="progress-bar">
-            <div class="progress-fill" style="width: ${Math.min(progress, 100)}%;"></div>
-          </div>
-          <div class="progress-text" style="margin-top: 8px;">
-            ${progress}% • 
-            <span style="background: ${badgeColor}; color: white; padding: 2px 8px; border-radius: 8px; font-size: 0.8rem;">
-              ${validatedStatus}
-            </span>
-          </div>
-        </div>
-        ${completedActivities ? `<ul style="margin-top:10px; font-size: 0.9rem; color:#4a5568;">${completedActivities}</ul>` : ''}
-        ${delmal.manual_status && delmal.manual_status.trim() !== validatedStatus ? `<div style="margin-top: 6px; font-size: 0.8rem; color: #718096;"><em>Observera: Manuell status (\"${delmal.manual_status}\") skiljer sig från beräknad status.</em></div>` : ''}
-      `;
-      return div;
+    iframe {
+      width: 100%;
+      height: 800px;
+      border: none;
     }
-
-    document.addEventListener('DOMContentLoaded', async function () {
-      const syncStatus = document.querySelector('.sync-status');
-      syncStatus.innerHTML = '🔄 Ansluter till Google Sheets...';
-
-      try {
-        await loadDelmalTab();
-        const now = new Date();
-        const timeString = now.toLocaleTimeString('sv-SE', { hour: '2-digit', minute: '2-digit' });
-        syncStatus.innerHTML = `✅ Synkroniserad med Google Sheets • Senast uppdaterad: Idag ${timeString}`;
-      } catch (err) {
-        syncStatus.innerHTML = '❌ Fel vid anslutning till Google Sheets';
-      }
-    });
-  </script>
-</body>
-</html>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 2rem;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 0.5rem;
+      text-align: left;
+    }
+    th {
+      background-color: #e0e0e0;
+    }
+    .note {
+      font-size: 0.9rem;
+      color: #666;
