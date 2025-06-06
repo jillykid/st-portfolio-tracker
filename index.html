@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ST Portfolio - Delmål & Aktiviteter</title>
   <style>
-    /* ... keep your existing CSS here ... */
+    /* Keep your existing CSS styles */
   </style>
 </head>
 <body>
@@ -16,7 +16,7 @@
     </header>
 
     <div class="sync-status">
-      ✅ Synkroniserad med Google Sheets • Senast uppdaterad: Idag 14:30
+      🔄 Ansluter till Google Sheets...
     </div>
 
     <div class="tabs">
@@ -40,7 +40,6 @@
 
     <div id="activities" class="tab-content">
       <div class="main-content">
-        <!-- Filtering and activity listing ... keep existing -->
         <div class="activity-list" id="activityList"></div>
       </div>
     </div>
@@ -55,7 +54,6 @@
 
   <script>
     const API_BASE_URL = 'https://script.google.com/macros/s/AKfycbw20mqd5nIjXCDogGeRIj_3Gmx5FdSO6lh2EGzY3UhzlH8qCJRoji18MdlAOsd067GYjg/exec';
-    let currentDelmalProgress = [];
 
     async function fetchFromAPI(action) {
       try {
@@ -73,9 +71,7 @@
       document.getElementById(tabName).classList.add('active');
       event.target.classList.add('active');
 
-      if (tabName === 'delmal') {
-        await loadDelmalTab();
-      }
+      if (tabName === 'delmal') await loadDelmalTab();
     }
 
     async function loadDelmalTab() {
@@ -83,7 +79,6 @@
       container.innerHTML = '<div style="text-align:center; padding:20px;">Laddar delmål...</div>';
 
       const data = await fetchFromAPI('getDelmalProgress');
-      currentDelmalProgress = data || [];
       container.innerHTML = '';
 
       if (!data || data.length === 0) {
@@ -99,16 +94,18 @@
 
     function createDelmalElement(delmal) {
       const div = document.createElement('div');
-      const progress = delmal.progress;
+
+      const progress = delmal.progress ?? 0;
+      const validatedStatus = delmal.validated_status || "Ej genomfört";
       const statusColor = {
         "Avklarat": "#48bb78",
         "Delvis genomfört": "#f6ad55",
         "Ej genomfört": "#f56565"
       };
 
-      const badgeColor = statusColor[delmal.validated_status] || "#ccc";
+      const badgeColor = statusColor[validatedStatus] || "#ccc";
 
-      div.className = `delmal-item ${delmal.validated_status === 'Avklarat' ? 'completed' : ''}`;
+      div.className = `delmal-item ${validatedStatus === 'Avklarat' ? 'completed' : ''}`;
       div.innerHTML = `
         <div class="delmal-code">${delmal.code}</div>
         <div class="delmal-title">${delmal.title}</div>
@@ -117,7 +114,10 @@
             <div class="progress-fill" style="width: ${Math.min(progress, 100)}%;"></div>
           </div>
           <div class="progress-text" style="margin-top: 8px;">
-            ${progress}% • <span style="background: ${badgeColor}; color: white; padding: 2px 8px; border-radius: 8px; font-size: 0.8rem;">${delmal.validated_status}</span>
+            ${progress}% • 
+            <span style="background: ${badgeColor}; color: white; padding: 2px 8px; border-radius: 8px; font-size: 0.8rem;">
+              ${validatedStatus}
+            </span>
           </div>
         </div>
       `;
