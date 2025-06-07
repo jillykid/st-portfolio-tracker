@@ -1,112 +1,1467 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sv">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ST Residency Tracker</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background-color: #f4f4f4;
-    }
-    header {
-      background-color: #007acc;
-      color: white;
-      padding: 1rem;
-      text-align: center;
-    }
-    main {
-      max-width: 1000px;
-      margin: 2rem auto;
-      background: white;
-      padding: 2rem;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    iframe {
-      width: 100%;
-      height: 800px;
-      border: none;
-    }
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      margin-top: 2rem;
-    }
-    th, td {
-      border: 1px solid #ccc;
-      padding: 0.5rem;
-      text-align: left;
-    }
-    th {
-      background-color: #e0e0e0;
-    }
-    .note {
-      font-size: 0.9rem;
-      color: #666;
-      margin-top: 1rem;
-    }
-    .error-message {
-      color: red;
-      margin-top: 1rem;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ST Portfolio Tracker - Psykiatri</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            line-height: 1.6;
+            color: #1f2937;
+            background: #f8fafc;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .header {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 32px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+            text-align: center;
+        }
+
+        .header h1 {
+            color: #111827;
+            font-size: 2.5rem;
+            margin-bottom: 8px;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+        }
+
+        .header p {
+            color: #6b7280;
+            font-size: 1.125rem;
+            margin: 0;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: white;
+            border-radius: 12px;
+            padding: 6px;
+            margin-bottom: 32px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
+
+        .nav-tab {
+            flex: 1;
+            padding: 12px 24px;
+            text-align: center;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .nav-tab.active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-tab:hover:not(.active) {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .search-filter {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 32px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
+
+        .search-row {
+            display: flex;
+            gap: 16px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .search-input, .filter-select {
+            padding: 12px 16px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.2s ease;
+            background: white;
+        }
+
+        .search-input {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-input:focus, .filter-select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .content-section {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            padding: 32px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
+
+        .content-section.active {
+            display: block;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 24px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e5e7eb;
+        }
+
+        .data-table th {
+            background: #f9fafb;
+            color: #374151;
+            padding: 16px 12px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .data-table td {
+            padding: 16px 12px;
+            border-bottom: 1px solid #f3f4f6;
+            vertical-align: top;
+            font-size: 14px;
+        }
+
+        .data-table tr:hover {
+            background: #f9fafb;
+        }
+
+        .data-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .type-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.025em;
+        }
+
+        .type-sit-in {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .type-cbd {
+            background: #ede9fe;
+            color: #7c3aed;
+        }
+
+        .type-360grader {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .type-bok {
+            background: #fef2f2;
+            color: #991b1b;
+        }
+
+        .type-artikel {
+            background: #f0f9ff;
+            color: #0c4a6e;
+        }
+
+        .type-podcast {
+            background: #f0fdf4;
+            color: #14532d;
+        }
+
+        .type-video {
+            background: #fefce8;
+            color: #854d0e;
+        }
+
+        .type-webinar {
+            background: #f5f3ff;
+            color: #5b21b6;
+        }
+
+        .link-button {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #3b82f6;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .link-button:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .goals-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .goal-tag {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            color: #374151;
+            font-weight: 500;
+        }
+
+        .status-completed {
+            background: #d1fae5;
+            color: #065f46;
+            border-color: #a7f3d0;
+        }
+
+        .status-planned {
+            background: #fef3c7;
+            color: #92400e;
+            border-color: #fde68a;
+        }
+
+        .status-ongoing {
+            background: #dbeafe;
+            color: #1e40af;
+            border-color: #bfdbfe;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+
+        .stat-card {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            padding: 24px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #111827;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        .delmal-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 24px;
+            margin-top: 24px;
+        }
+
+        .delmal-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid #e5e7eb;
+            border-left: 4px solid;
+            transition: all 0.2s ease;
+        }
+
+        .delmal-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .delmal-card.category-a {
+            border-left-color: #3b82f6;
+        }
+
+        .delmal-card.category-b {
+            border-left-color: #10b981;
+        }
+
+        .delmal-card.category-c {
+            border-left-color: #f59e0b;
+        }
+
+        .delmal-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+            gap: 12px;
+        }
+
+        .delmal-code {
+            background: #3b82f6;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .delmal-title {
+            font-weight: 600;
+            font-size: 16px;
+            color: #111827;
+            flex: 1;
+        }
+
+        .delmal-description {
+            color: #4b5563;
+            line-height: 1.6;
+            margin-bottom: 16px;
+            font-size: 14px;
+        }
+
+        .delmal-coverage {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .coverage-section {
+            background: #f9fafb;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #f3f4f6;
+        }
+
+        .coverage-title {
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 8px;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .coverage-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .coverage-item {
+            background: white;
+            border: 1px solid #e5e7eb;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #6b7280;
+        }
+
+        .category-filter {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            padding: 12px 20px;
+            border: 1px solid #d1d5db;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .category-btn.active {
+            border-color: #3b82f6;
+            background: #3b82f6;
+            color: white;
+        }
+
+        .category-btn:hover:not(.active) {
+            border-color: #3b82f6;
+            color: #3b82f6;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 48px;
+            color: #6b7280;
+            font-style: italic;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+            
+            .header {
+                padding: 24px;
+                margin-bottom: 24px;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .nav-tabs {
+                flex-direction: column;
+                gap: 4px;
+                padding: 4px;
+            }
+            
+            .nav-tab {
+                padding: 12px 16px;
+            }
+            
+            .search-row {
+                flex-direction: column;
+            }
+            
+            .search-input {
+                min-width: 100%;
+            }
+            
+            .content-section {
+                padding: 20px;
+            }
+            
+            .data-table {
+                font-size: 12px;
+            }
+            
+            .data-table th, .data-table td {
+                padding: 12px 8px;
+            }
+            
+            .summary-stats {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .delmal-cards {
+                grid-template-columns: 1fr;
+                gap: 16px;
+            }
+            
+            .category-filter {
+                justify-content: center;
+            }
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <h1>ST Residency Tracker</h1>
-    <p>Overview of Courses, Clinical Placements, Competencies & Goals</p>
-  </header>
-  <main>
-    <h2>Live Google Sheet</h2>
-    <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTIFShDloT0vTYCfl_bKrS3hwhndQGyqZo2o1sKOXAiAAyIjA6LyOYeISomSwJzEaGdt4SKCDzWsCa3/pubhtml?widget=true&amp;headers=false"></iframe>
-    <p class="note">This view is read-only. Edit directly in the Google Sheet for updates to reflect here.</p>
+    <div class="container">
+        <div class="header">
+            <h1>ST Portfolio Tracker</h1>
+            <p>Specialistläkarutbildning Psykiatri - Utbildningsportfölj</p>
+        </div>
 
-    <h2>Linked Documents</h2>
-    <div id="error" class="error-message"></div>
-    <table id="docsTable">
-      <thead>
-        <tr>
-          <th>Category</th>
-          <th>Title</th>
-          <th>Link</th>
-        </tr>
-      </thead>
-      <tbody>
-        <!-- Populated via JavaScript -->
-      </tbody>
-    </table>
-  </main>
+        <div class="nav-tabs">
+            <div class="nav-tab active" onclick="showSection('delmal')">Delmål</div>
+            <div class="nav-tab" onclick="showSection('kurser')">Kurser</div>
+            <div class="nav-tab" onclick="showSection('placeringar')">Placeringar</div>
+            <div class="nav-tab" onclick="showSection('laslista')">Läslista</div>
+            <div class="nav-tab" onclick="showSection('portfolio')">Bedömningar</div>
+        </div>
 
-  <script>
-    fetch('https://script.google.com/macros/s/AKfycbzVYgQs8fs09drBk3SY6HZeULL9DxCBq3MBWJO_2nENNg_XK3pUzMwSZwsvRUB0O1ZwXg/exec')
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
+        <div class="search-filter">
+            <div class="search-row">
+                <input type="text" class="search-input" id="searchInput" placeholder="Sök efter titel, ansvarig, eller anteckningar...">
+                <select class="filter-select" id="statusFilter">
+                    <option value="">Alla status</option>
+                    <option value="completed">Genomförda</option>
+                    <option value="ongoing">Pågående</option>
+                    <option value="planned">Planerade</option>
+                </select>
+                <select class="filter-select" id="yearFilter">
+                    <option value="">Alla år</option>
+                    <option value="2024">2024</option>
+                    <option value="2025">2025</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Learning Objectives Section -->
+        <div class="content-section active" id="delmal-section">
+            <div class="summary-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="delmal-total">28</div>
+                    <div class="stat-label">Totalt delmål</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="delmal-a">6</div>
+                    <div class="stat-label">A-mål (Grund)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="delmal-b">5</div>
+                    <div class="stat-label">B-mål (Klinisk)</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="delmal-c">13</div>
+                    <div class="stat-label">C-mål (Specialist)</div>
+                </div>
+            </div>
+
+            <div class="delmal-cards" id="delmal-cards">
+                <!-- Data will be populated by JavaScript -->
+            </div>
+            <div class="no-results" id="delmal-no-results" style="display: none;">
+                Inga delmål matchar dina sökkriterier.
+            </div>
+        </div>
+
+        <!-- Courses Section -->
+        <div class="content-section" id="kurser-section">
+            <div class="summary-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="kurser-total">7</div>
+                    <div class="stat-label">Totalt kurser</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="kurser-completed">5</div>
+                    <div class="stat-label">Genomförda</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="kurser-planned">2</div>
+                    <div class="stat-label">Planerade</div>
+                </div>
+            </div>
+
+            <table class="data-table" id="kurser-table">
+                <thead>
+                    <tr>
+                        <th>Titel</th>
+                        <th>Period</th>
+                        <th>Ansvarig/Bedömare</th>
+                        <th>Delmål</th>
+                        <th>Länk</th>
+                        <th>Anteckningar</th>
+                    </tr>
+                </thead>
+                <tbody id="kurser-tbody">
+                    <!-- Data will be populated by JavaScript -->
+                </tbody>
+            </table>
+            <div class="no-results" id="kurser-no-results" style="display: none;">
+                Inga kurser matchar dina sökkriterier.
+            </div>
+        </div>
+
+        <!-- Placements Section -->
+        <div class="content-section" id="placeringar-section">
+            <div class="summary-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="placeringar-total">15</div>
+                    <div class="stat-label">Totalt placeringar</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="placeringar-completed">6</div>
+                    <div class="stat-label">Genomförda</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="placeringar-planned">9</div>
+                    <div class="stat-label">Planerade</div>
+                </div>
+            </div>
+
+            <table class="data-table" id="placeringar-table">
+                <thead>
+                    <tr>
+                        <th>Titel</th>
+                        <th>Period</th>
+                        <th>Ansvarig/Bedömare</th>
+                        <th>Delmål</th>
+                        <th>Länk</th>
+                        <th>Anteckningar</th>
+                    </tr>
+                </thead>
+                <tbody id="placeringar-tbody">
+                    <!-- Data will be populated by JavaScript -->
+                </tbody>
+            </table>
+            <div class="no-results" id="placeringar-no-results" style="display: none;">
+                Inga placeringar matchar dina sökkriterier.
+            </div>
+        </div>
+
+        <!-- Reading List Section -->
+        <div class="content-section" id="laslista-section">
+            <div class="summary-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="laslista-total">0</div>
+                    <div class="stat-label">Totalt läsning</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="laslista-completed">0</div>
+                    <div class="stat-label">Genomförda</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="laslista-planned">0</div>
+                    <div class="stat-label">Planerade</div>
+                </div>
+            </div>
+
+            <table class="data-table" id="laslista-table">
+                <thead>
+                    <tr>
+                        <th>Typ</th>
+                        <th>Titel</th>
+                        <th>Författare/Källa</th>
+                        <th>Datum</th>
+                        <th>Delmål</th>
+                        <th>Länk</th>
+                        <th>Anteckningar</th>
+                    </tr>
+                </thead>
+                <tbody id="laslista-tbody">
+                    <!-- Data will be populated by JavaScript -->
+                </tbody>
+            </table>
+            <div class="no-results" id="laslista-no-results" style="display: none;">
+                Inga läslistor matchar dina sökkriterier.
+            </div>
+        </div>
+
+        <!-- Portfolio Activities Section -->
+        <div class="content-section" id="portfolio-section">
+            <div class="summary-stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="portfolio-total">12</div>
+                    <div class="stat-label">Totalt bedömningar</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="portfolio-completed">9</div>
+                    <div class="stat-label">Genomförda</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="portfolio-planned">3</div>
+                    <div class="stat-label">Planerade</div>
+                </div>
+            </div>
+
+            <table class="data-table" id="portfolio-table">
+                <thead>
+                    <tr>
+                        <th>Typ</th>
+                        <th>Titel</th>
+                        <th>Period</th>
+                        <th>Ansvarig/Bedömare</th>
+                        <th>Länk</th>
+                        <th>Anteckningar</th>
+                    </tr>
+                </thead>
+                <tbody id="portfolio-tbody">
+                    <!-- Data will be populated by JavaScript -->
+                </tbody>
+            </table>
+            <div class="no-results" id="portfolio-no-results" style="display: none;">
+                Inga bedömningar matchar dina sökkriterier.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration - Google Sheets CSV URLs
+        const SHEET_URLS = {
+            delmal: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTO7RdhNGB9AGvPYbdDieARG4DmV1i1Tu--Zwv_ZyL-YvipCAuhAZLJ3b9t-sWOE9OoBTl0sRQh66UH/pub?gid=0&single=true&output=csv',
+            kurser: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTO7RdhNGB9AGvPYbdDieARG4DmV1i1Tu--Zwv_ZyL-YvipCAuhAZLJ3b9t-sWOE9OoBTl0sRQh66UH/pub?gid=326536759&single=true&output=csv',
+            placeringar: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTO7RdhNGB9AGvPYbdDieARG4DmV1i1Tu--Zwv_ZyL-YvipCAuhAZLJ3b9t-sWOE9OoBTl0sRQh66UH/pub?gid=635332228&single=true&output=csv',
+            laslista: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTO7RdhNGB9AGvPYbdDieARG4DmV1i1Tu--Zwv_ZyL-YvipCAuhAZLJ3b9t-sWOE9OoBTl0sRQh66UH/pub?gid=1415009810&single=true&output=csv',
+            portfolio: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTO7RdhNGB9AGvPYbdDieARG4DmV1i1Tu--Zwv_ZyL-YvipCAuhAZLJ3b9t-sWOE9OoBTl0sRQh66UH/pub?gid=1653992571&single=true&output=csv'
+        };
+
+        // Data containers - will be populated from Google Sheets
+        let portfolioData = [];
+        let kurserData = [];
+        let placeringarData = [];
+        let laslistaData = [];
+        let delmalData = [];
+
+        let currentData = [];
+        let currentSection = 'delmal';
+        let currentCategory = 'all';
+        let isLoading = false;
+
+        // Utility function to parse CSV
+        function parseCSV(csvText) {
+            const lines = csvText.split('\n').filter(line => line.trim());
+            if (lines.length < 2) return [];
+            
+            const headers = lines[0].split(',').map(h => h.replace(/"/g, '').trim());
+            const data = [];
+            
+            for (let i = 1; i < lines.length; i++) {
+                const values = [];
+                let current = '';
+                let inQuotes = false;
+                
+                for (let j = 0; j < lines[i].length; j++) {
+                    const char = lines[i][j];
+                    if (char === '"') {
+                        inQuotes = !inQuotes;
+                    } else if (char === ',' && !inQuotes) {
+                        values.push(current.trim());
+                        current = '';
+                    } else {
+                        current += char;
+                    }
+                }
+                values.push(current.trim());
+                
+                if (values.length === headers.length) {
+                    const row = {};
+                    headers.forEach((header, index) => {
+                        row[header.toLowerCase()] = values[index].replace(/"/g, '');
+                    });
+                    data.push(row);
+                }
+            }
+            return data;
         }
-        return response.json();
-      })
-      .then(data => {
-        if (!Array.isArray(data)) {
-          throw new Error("Unexpected data format. Expected an array.");
+
+        // Function to determine status based on data
+        function determineStatus(period, anteckningar) {
+            if (!period || period === '...' || period === '') {
+                if (anteckningar && anteckningar.toLowerCase().includes('planerad')) {
+                    return 'planned';
+                }
+                return 'planned';
+            }
+            
+            if (anteckningar && anteckningar.toLowerCase().includes('planerad')) {
+                return 'planned';
+            }
+            
+            // Check if period is in the future
+            const currentYear = new Date().getFullYear();
+            if (period.includes('2025') && currentYear < 2025) {
+                return 'planned';
+            }
+            
+            if (period.includes(currentYear.toString()) && 
+                (anteckningar && anteckningar.toLowerCase().includes('pågående'))) {
+                return 'ongoing';
+            }
+            
+            return 'completed';
         }
-        const tbody = document.querySelector("#docsTable tbody");
-        tbody.innerHTML = "";
-        data.forEach(row => {
-          const tr = document.createElement("tr");
-          tr.innerHTML = `
-            <td>${row.Category || ''}</td>
-            <td>${row.Title || ''}</td>
-            <td><a href="${row.DriveLink}" target="_blank">View</a></td>
-          `;
-          tbody.appendChild(tr);
+
+        // Function to parse delmål string into array
+        function parseDelmål(delmalStr) {
+            if (!delmalStr || delmalStr === '...' || delmalStr === '') return [];
+            return delmalStr.split(',').map(d => d.trim()).filter(d => d);
+        }
+
+        // Fetch data from Google Sheets with fallback
+        async function fetchSheetData(url) {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                const csvText = await response.text();
+                return parseCSV(csvText);
+            } catch (error) {
+                console.error('Error fetching sheet data:', error);
+                return null; // Return null instead of empty array to distinguish from empty sheet
+            }
+        }
+
+        // Fallback data in case Google Sheets can't be loaded
+        const fallbackData = {
+            portfolio: [
+                {
+                    typ: "sit-in",
+                    titel: "sit-in konsult", 
+                    period: "2024",
+                    ansvarig: "Darja Danlova",
+                    länk: "https://drive.google.com/file/d/1KFXDMYe9km4iavmUNI3WZwslTe3qAVkP/view?usp=sharing",
+                    anteckningar: "sit-in med konsultläkare",
+                    status: "completed"
+                },
+                {
+                    typ: "360grader",
+                    titel: "360 Kurator bipolärmottagning",
+                    period: "2024", 
+                    ansvarig: "Frida Nilsson",
+                    länk: "https://drive.google.com/file/d/1_1JJGrGS9xvzFNYH9EfGLQ8YO3di_gYT/view?usp=sharing",
+                    anteckningar: "Kurator på bipolärmottagning",
+                    status: "completed"
+                }
+            ],
+            kurser: [
+                {
+                    titel: "Introduktionskurs i ledarskap",
+                    period: "240301-240531",
+                    ansvarig: "Christina Christoffersen", 
+                    delmål: ["a1"],
+                    länk: "https://drive.google.com/file/d/15CWoRlY26mNmvUQzXPrEOpq8kvukNs-C/view?usp=sharing",
+                    anteckningar: "FSL",
+                    status: "completed"
+                }
+            ],
+            placeringar: [
+                {
+                    titel: "PIVA",
+                    period: "230901-231130 and 240301-240631",
+                    ansvarig: "Said Ghabin",
+                    delmål: ["a1", "a2", "a3", "a5", "a6", "b1", "b2", "b3", "c1", "c2", "c4", "c3", "c5", "c6", "c7", "c8", "c10", "c11"],
+                    länk: "https://drive.google.com/file/d/1UOkMhXnjhHbKmCkGFGhuTo7xiUhTkGIl/view?usp=sharing",
+                    anteckningar: "PIVA placering Malmö", 
+                    status: "completed"
+                }
+            ],
+            laslista: [
+                {
+                    typ: "Bok",
+                    titel: "Kaplan & Sadock's Synopsis of Psychiatry",
+                    författare: "Benjamin J. Sadock",
+                    datum: "2024-03-15",
+                    delmål: ["c1", "c2"],
+                    länk: "",
+                    anteckningar: "Grundläggande psykiatri",
+                    status: "completed"
+                },
+                {
+                    typ: "Podcast",
+                    titel: "The Carlat Psychiatry Podcast",
+                    författare: "Carlat Publishing",
+                    datum: "2024-06-01",
+                    delmål: ["c4"],
+                    länk: "https://thecarlatreport.com/podcast/",
+                    anteckningar: "Psykofarmakologi",
+                    status: "ongoing"
+                }
+            ],
+            delmal: [
+                {
+                    kod: "a1",
+                    titel: "Medarbetarskap, ledarskap o pedagogik",
+                    beskrivning: "Kunna ta ansvar för det kontinuerliga lärandet på arbetsplatsen. Kunna utöva ledarskap i det dagliga arbetet.",
+                    kurser: ["Introduktionskurs i ledarskap"],
+                    placeringar: ["PIVA", "Bipolärmottagning"],
+                    kategori: "a"
+                }
+            ]
+        };
+
+        // Process portfolio data
+        function processPortfolioData(rawData) {
+            return rawData.map(row => ({
+                typ: row.typ || '',
+                titel: row.titel || '',
+                period: row.tidsperiod || '',
+                ansvarig: row['ansvarig/bedömare'] || '',
+                länk: row.länk || '',
+                anteckningar: row.anteckningar || '',
+                status: determineStatus(row.tidsperiod, row.anteckningar)
+            })).filter(item => item.titel);
+        }
+
+        // Process kurser data
+        function processKurserData(rawData) {
+            return rawData.map(row => ({
+                titel: row.titel || '',
+                period: row.tidsperiod || '',
+                ansvarig: row['ansvarig/bedömare'] || '',
+                delmål: parseDelmål(row.delmål),
+                länk: row.länk || '',
+                anteckningar: row.anteckningar || '',
+                status: determineStatus(row.tidsperiod, row.anteckningar)
+            })).filter(item => item.titel);
+        }
+
+        // Process placeringar data
+        function processPlaceringarData(rawData) {
+            return rawData.map(row => ({
+                titel: row.titel || '',
+                period: row.tidsperiod || '',
+                ansvarig: row['ansvarig/bedömare'] || '',
+                delmål: parseDelmål(row.delmål),
+                länk: row.länk || '',
+                anteckningar: row.anteckningar || '',
+                status: determineStatus(row.tidsperiod, row.anteckningar)
+            })).filter(item => item.titel);
+        }
+
+        // Process läslista data
+        function processLaslistaData(rawData) {
+            console.log('Raw Läslista data:', rawData);
+            console.log('First row headers:', rawData.length > 0 ? Object.keys(rawData[0]) : 'No data');
+            
+            const processed = rawData.map(row => {
+                console.log('Processing row:', row);
+                return {
+                    typ: row.typ || '',
+                    titel: row.titel || '',
+                    författare: row['författare/källa'] || row.författare || row.källa || '',
+                    datum: row.datum || '',
+                    delmål: parseDelmål(row.delmål),
+                    länk: row.länk || '',
+                    anteckningar: row.anteckningar || '',
+                    status: determineStatus(row.datum, row.anteckningar)
+                };
+            }).filter(item => item.titel);
+            
+            console.log('Processed Läslista data:', processed);
+            return processed;
+        }
+
+        // Process delmål data
+        function processDelmalData(rawData) {
+            return rawData.map(row => ({
+                kod: row.delmål || '',
+                titel: row.titel || '',
+                beskrivning: row.beskrivningar || '',
+                kurser: row.kursintyg ? row.kursintyg.split(',').map(k => k.trim()).filter(k => k && k !== '...') : [],
+                placeringar: row.tjänstgöringsintyg ? row.tjänstgöringsintyg.split(',').map(p => p.trim()).filter(p => p && p !== '...') : [],
+                kategori: (row.delmål || '').charAt(0).toLowerCase()
+            })).filter(item => item.kod);
+        }
+
+        // Load all data with fallback support
+        async function loadAllData() {
+            isLoading = true;
+            showLoadingState();
+            
+            try {
+                console.log('Attempting to load data from Google Sheets...');
+                
+                const [delmalRaw, kurserRaw, placeringarRaw, laslistaRaw, portfolioRaw] = await Promise.all([
+                    fetchSheetData(SHEET_URLS.delmal),
+                    fetchSheetData(SHEET_URLS.kurser),
+                    fetchSheetData(SHEET_URLS.placeringar),
+                    fetchSheetData(SHEET_URLS.laslista),
+                    fetchSheetData(SHEET_URLS.portfolio)
+                ]);
+
+                // Check if any data was successfully loaded
+                const hasLiveData = delmalRaw || kurserRaw || placeringarRaw || laslistaRaw || portfolioRaw;
+                
+                if (hasLiveData) {
+                    console.log('Successfully loaded some data from Google Sheets');
+                    delmalData = delmalRaw ? processDelmalData(delmalRaw) : fallbackData.delmal;
+                    kurserData = kurserRaw ? processKurserData(kurserRaw) : fallbackData.kurser;
+                    placeringarData = placeringarRaw ? processPlaceringarData(placeringarRaw) : fallbackData.placeringar;
+                    laslistaData = laslistaRaw ? processLaslistaData(laslistaRaw) : fallbackData.laslista;
+                    portfolioData = portfolioRaw ? processPortfolioData(portfolioRaw) : fallbackData.portfolio;
+                } else {
+                    console.log('Failed to load from Google Sheets, using fallback data');
+                    delmalData = fallbackData.delmal;
+                    kurserData = fallbackData.kurser;
+                    placeringarData = fallbackData.placeringar;
+                    laslistaData = fallbackData.laslista;
+                    portfolioData = fallbackData.portfolio;
+                    
+                    showFallbackNotice();
+                }
+
+                currentData = delmalData;
+                hideLoadingState();
+                renderData();
+                
+                console.log('Data loaded successfully:', {
+                    delmal: delmalData.length,
+                    kurser: kurserData.length,
+                    placeringar: placeringarData.length,
+                    laslista: laslistaData.length,
+                    portfolio: portfolioData.length
+                });
+                
+            } catch (error) {
+                console.error('Error loading data:', error);
+                
+                // Use fallback data
+                delmalData = fallbackData.delmal;
+                kurserData = fallbackData.kurser;
+                placeringarData = fallbackData.placeringar;
+                laslistaData = fallbackData.laslista;
+                portfolioData = fallbackData.portfolio;
+                currentData = delmalData;
+                
+                hideLoadingState();
+                showFallbackNotice();
+                renderData();
+            }
+            
+            isLoading = false;
+        }
+
+        // Loading and error states
+        function showLoadingState() {
+            document.body.insertAdjacentHTML('beforeend', `
+                <div id="loading-overlay" style="
+                    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                    background: rgba(255,255,255,0.9); z-index: 9999;
+                    display: flex; align-items: center; justify-content: center;
+                    font-size: 18px; color: #667eea;
+                ">
+                    <div style="text-align: center;">
+                        <div style="border: 4px solid #f3f3f3; border-top: 4px solid #667eea; 
+                                   border-radius: 50%; width: 40px; height: 40px; 
+                                   animation: spin 1s linear infinite; margin: 0 auto 20px;"></div>
+                        Laddar data från Google Sheets...
+                    </div>
+                </div>
+                <style>
+                @keyframes spin {
+                    0% { transform: rotate(0deg); }
+                    100% { transform: rotate(360deg); }
+                }
+                </style>
+            `);
+        }
+
+        function hideLoadingState() {
+            const overlay = document.getElementById('loading-overlay');
+            if (overlay) overlay.remove();
+        }
+
+        function showErrorState() {
+            hideLoadingState();
+            document.body.insertAdjacentHTML('beforeend', `
+                <div id="error-overlay" style="
+                    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+                    background: rgba(248, 250, 252, 0.95); z-index: 9999;
+                    display: flex; align-items: center; justify-content: center;
+                    font-size: 16px; color: #dc2626; text-align: center;
+                    padding: 20px;
+                ">
+                    <div style="max-width: 500px; background: white; padding: 32px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); border: 1px solid #e5e7eb;">
+                        <h3 style="margin: 0 0 16px 0; color: #111827;">🔒 CORS-begränsning</h3>
+                        <p style="margin: 0 0 16px 0; color: #4b5563;">Webbläsaren blockerar direkt åtkomst till Google Sheets på grund av säkerhetspolicyer.</p>
+                        <p style="margin: 0 0 24px 0; font-size: 14px; color: #6b7280;">
+                            <strong>Lösningar:</strong><br>
+                            1. Ladda ner HTML-filen och öppna den lokalt<br>
+                            2. Använd en webbserver (kan inte köras direkt från filutforskaren)<br>
+                            3. Använd Google Apps Script för API-åtkomst
+                        </p>
+                        <div style="display: flex; gap: 12px; justify-content: center;">
+                            <button onclick="loadFallbackData()" style="
+                                background: #3b82f6; color: white; border: none;
+                                padding: 12px 20px; border-radius: 8px;
+                                cursor: pointer; font-weight: 500;
+                            ">Använd demo-data</button>
+                            <button onclick="location.reload()" style="
+                                background: #6b7280; color: white; border: none;
+                                padding: 12px 20px; border-radius: 8px;
+                                cursor: pointer; font-weight: 500;
+                            ">Försök igen</button>
+                        </div>
+                    </div>
+                </div>
+            `);
+        }
+
+        // Show notice when using fallback data
+        function showFallbackNotice() {
+            const notice = document.createElement('div');
+            notice.style.cssText = `
+                background: #fef3c7; border: 1px solid #f59e0b; color: #92400e;
+                padding: 16px 20px; border-radius: 12px; margin: 24px auto;
+                max-width: 1200px; text-align: center; font-size: 14px;
+                box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            `;
+            notice.innerHTML = `
+                ⚠️ <strong>Demo-läge:</strong> Kunde inte ladda live data från Google Sheets. 
+                Visar exempel-data. Klicka på 🔄 Uppdatera data för att försöka igen.
+            `;
+            document.body.insertBefore(notice, document.querySelector('.container'));
+            
+            // Auto-remove after 10 seconds
+            setTimeout(() => notice.remove(), 10000);
+        }
+
+        // Add refresh button to header
+        function addRefreshButton() {
+            const header = document.querySelector('.header');
+            header.insertAdjacentHTML('beforeend', `
+                <button id="refresh-btn" onclick="refreshData()" style="
+                    background: #3b82f6;
+                    color: white; border: none; padding: 12px 24px;
+                    border-radius: 8px; cursor: pointer; margin-top: 20px;
+                    font-weight: 500; transition: all 0.2s ease;
+                    font-size: 14px; border: 1px solid transparent;
+                " onmouseover="this.style.background='#2563eb'" 
+                   onmouseout="this.style.background='#3b82f6'">
+                    🔄 Uppdatera data
+                </button>
+            `);
+        }
+
+        // Refresh data function
+        async function refreshData() {
+            if (isLoading) return;
+            
+            const btn = document.getElementById('refresh-btn');
+            btn.innerHTML = '⏳ Uppdaterar...';
+            btn.disabled = true;
+            
+            await loadAllData();
+            
+            btn.innerHTML = '🔄 Uppdatera data';
+            btn.disabled = false;
+        }
+
+        // Function to manually load fallback data
+        function loadFallbackData() {
+            delmalData = fallbackData.delmal;
+            kurserData = fallbackData.kurser;
+            placeringarData = fallbackData.placeringar;
+            laslistaData = fallbackData.laslista;
+            portfolioData = fallbackData.portfolio;
+            currentData = delmalData;
+            
+            const overlay = document.getElementById('error-overlay');
+            if (overlay) overlay.remove();
+            
+            renderData();
+            showFallbackNotice();
+        }
+
+        function showSection(section) {
+            // Update active tab
+            document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Hide all sections
+            document.querySelectorAll('.content-section').forEach(sec => sec.classList.remove('active'));
+            
+            // Show selected section
+            document.getElementById(section + '-section').classList.add('active');
+            
+            currentSection = section;
+            currentCategory = 'all';
+            
+            switch(section) {
+                case 'delmal':
+                    currentData = delmalData;
+                    break;
+                case 'kurser':
+                    currentData = kurserData;
+                    break;
+                case 'placeringar':
+                    currentData = placeringarData;
+                    break;
+                case 'laslista':
+                    currentData = laslistaData;
+                    break;
+                case 'portfolio':
+                    currentData = portfolioData;
+                    break;
+            }
+            
+            if (currentData.length > 0) {
+                renderData();
+            }
+        }
+
+        function getStatusClass(status) {
+            switch(status) {
+                case 'completed': return 'status-completed';
+                case 'ongoing': return 'status-ongoing';
+                case 'planned': return 'status-planned';
+                default: return '';
+            }
+        }
+
+        function renderPortfolioRow(item) {
+            const linkCell = item.länk ? 
+                `<a href="${item.länk}" target="_blank" class="link-button">Visa dokument</a>` : 
+                '<span style="color: #94a3b8;">Ingen länk</span>';
+            
+            return `
+                <tr>
+                    <td><span class="type-badge type-${item.typ}">${item.typ}</span></td>
+                    <td><strong>${item.titel}</strong></td>
+                    <td>${item.period}</td>
+                    <td>${item.ansvarig}</td>
+                    <td>${linkCell}</td>
+                    <td>${item.anteckningar}</td>
+                </tr>
+            `;
+        }
+
+        function renderKurserRow(item) {
+            const linkCell = item.länk ? 
+                `<a href="${item.länk}" target="_blank" class="link-button">Visa certifikat</a>` : 
+                '<span style="color: #94a3b8;">Ingen länk</span>';
+            
+            const goalsHtml = item.delmål.map(goal => 
+                `<span class="goal-tag">${goal}</span>`
+            ).join('');
+
+            return `
+                <tr>
+                    <td><strong>${item.titel}</strong></td>
+                    <td>${item.period}</td>
+                    <td>${item.ansvarig}</td>
+                    <td><div class="goals-list">${goalsHtml}</div></td>
+                    <td>${linkCell}</td>
+                    <td>${item.anteckningar}</td>
+                </tr>
+            `;
+        }
+
+        function renderPlaceringarRow(item) {
+            const linkCell = item.länk ? 
+                `<a href="${item.länk}" target="_blank" class="link-button">Visa intyg</a>` : 
+                '<span style="color: #94a3b8;">Ingen länk</span>';
+            
+            const goalsHtml = item.delmål.map(goal => 
+                `<span class="goal-tag">${goal}</span>`
+            ).join('');
+
+            return `
+                <tr>
+                    <td><strong>${item.titel}</strong></td>
+                    <td>${item.period}</td>
+                    <td>${item.ansvarig}</td>
+                    <td><div class="goals-list">${goalsHtml}</div></td>
+                    <td>${linkCell}</td>
+                    <td>${item.anteckningar}</td>
+                </tr>
+            `;
+        }
+
+        function renderLaslistaRow(item) {
+            const linkCell = item.länk ? 
+                `<a href="${item.länk}" target="_blank" class="link-button">Visa länk</a>` : 
+                '<span style="color: #94a3b8;">Ingen länk</span>';
+            
+            const goalsHtml = item.delmål.map(goal => 
+                `<span class="goal-tag">${goal}</span>`
+            ).join('');
+
+            const typeBadge = `<span class="type-badge type-${item.typ.toLowerCase().replace(/[åäö\s]/g, '')}">${item.typ}</span>`;
+
+            return `
+                <tr>
+                    <td>${typeBadge}</td>
+                    <td><strong>${item.titel}</strong></td>
+                    <td>${item.författare}</td>
+                    <td>${item.datum}</td>
+                    <td><div class="goals-list">${goalsHtml}</div></td>
+                    <td>${linkCell}</td>
+                    <td>${item.anteckningar}</td>
+                </tr>
+            `;
+        }
+
+        function renderDelmalCard(item) {
+            const kurserHtml = item.kurser.map(kurs => 
+                `<span class="coverage-item">${kurs}</span>`
+            ).join('');
+            
+            const placeringarHtml = item.placeringar.map(placering => 
+                `<span class="coverage-item">${placering}</span>`
+            ).join('');
+
+            return `
+                <div class="delmal-card category-${item.kategori}">
+                    <div class="delmal-header">
+                        <div class="delmal-code">${item.kod}</div>
+                        <div class="delmal-title">${item.titel}</div>
+                    </div>
+                    <div class="delmal-description">${item.beskrivning}</div>
+                    <div class="delmal-coverage">
+                        ${kurserHtml ? `
+                            <div class="coverage-section">
+                                <div class="coverage-title">Kurser</div>
+                                <div class="coverage-items">${kurserHtml}</div>
+                            </div>
+                        ` : ''}
+                        ${placeringarHtml ? `
+                            <div class="coverage-section">
+                                <div class="coverage-title">Placeringar</div>
+                                <div class="coverage-items">${placeringarHtml}</div>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function filterByCategory(category) {
+            currentCategory = category;
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderData();
+        }
+
+        function renderData() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const statusFilter = document.getElementById('statusFilter').value;
+            const yearFilter = document.getElementById('yearFilter').value;
+
+            let filteredData = currentData.filter(item => {
+                const matchesSearch = !searchTerm || 
+                    item.titel.toLowerCase().includes(searchTerm) ||
+                    (item.ansvarig && item.ansvarig.toLowerCase().includes(searchTerm)) ||
+                    (item.anteckningar && item.anteckningar.toLowerCase().includes(searchTerm)) ||
+                    (item.beskrivning && item.beskrivning.toLowerCase().includes(searchTerm));
+                
+                const matchesStatus = !statusFilter || item.status === statusFilter;
+                const matchesYear = !yearFilter || (item.period && item.period.includes(yearFilter));
+                const matchesCategory = currentSection !== 'delmal' || currentCategory === 'all' || item.kategori === currentCategory;
+                
+                return matchesSearch && matchesStatus && matchesYear && matchesCategory;
+            });
+
+            if (currentSection === 'delmal') {
+                renderDelmalSection(filteredData);
+            } else {
+                renderTableSection(filteredData);
+            }
+
+            updateStats();
+        }
+
+        function renderDelmalSection(filteredData) {
+            const cardsContainer = document.getElementById('delmal-cards');
+            const noResults = document.getElementById('delmal-no-results');
+
+            // Add category filter if not already present
+            if (!document.querySelector('.category-filter')) {
+                const filterHtml = `
+                    <div class="category-filter">
+                        <div class="category-btn active" onclick="filterByCategory('all')">Alla (${delmalData.length})</div>
+                        <div class="category-btn" onclick="filterByCategory('a')">A-mål (${delmalData.filter(item => item.kategori === 'a').length})</div>
+                        <div class="category-btn" onclick="filterByCategory('b')">B-mål (${delmalData.filter(item => item.kategori === 'b').length})</div>
+                        <div class="category-btn" onclick="filterByCategory('c')">C-mål (${delmalData.filter(item => item.kategori === 'c').length})</div>
+                    </div>
+                `;
+                cardsContainer.insertAdjacentHTML('beforebegin', filterHtml);
+            }
+
+            if (filteredData.length === 0) {
+                cardsContainer.style.display = 'none';
+                noResults.style.display = 'block';
+            } else {
+                cardsContainer.style.display = 'grid';
+                noResults.style.display = 'none';
+                
+                let cardsHtml = '';
+                filteredData.forEach(item => {
+                    cardsHtml += renderDelmalCard(item);
+                });
+                cardsContainer.innerHTML = cardsHtml;
+            }
+        }
+
+        function renderTableSection(filteredData) {
+            const tbody = document.getElementById(currentSection + '-tbody');
+            const noResults = document.getElementById(currentSection + '-no-results');
+            const table = document.getElementById(currentSection + '-table');
+
+            if (filteredData.length === 0) {
+                table.style.display = 'none';
+                noResults.style.display = 'block';
+            } else {
+                table.style.display = 'table';
+                noResults.style.display = 'none';
+                
+                let rowsHtml = '';
+                filteredData.forEach(item => {
+                    switch(currentSection) {
+                        case 'portfolio':
+                            rowsHtml += renderPortfolioRow(item);
+                            break;
+                        case 'kurser':
+                            rowsHtml += renderKurserRow(item);
+                            break;
+                        case 'placeringar':
+                            rowsHtml += renderPlaceringarRow(item);
+                            break;
+                        case 'laslista':
+                            rowsHtml += renderLaslistaRow(item);
+                            break;
+                    }
+                });
+                tbody.innerHTML = rowsHtml;
+            }
+        }
+
+        function updateStats() {
+            if (currentSection === 'delmal') {
+                // Stats for delmål are static based on categories
+                document.getElementById('delmal-total').textContent = delmalData.length;
+                document.getElementById('delmal-a').textContent = delmalData.filter(item => item.kategori === 'a').length;
+                document.getElementById('delmal-b').textContent = delmalData.filter(item => item.kategori === 'b').length;
+                document.getElementById('delmal-c').textContent = delmalData.filter(item => item.kategori === 'c').length;
+            } else {
+                const completed = currentData.filter(item => item.status === 'completed').length;
+                const planned = currentData.filter(item => item.status === 'planned').length;
+                const ongoing = currentData.filter(item => item.status === 'ongoing').length;
+
+                document.getElementById(currentSection + '-total').textContent = currentData.length;
+                document.getElementById(currentSection + '-completed').textContent = completed;
+                document.getElementById(currentSection + '-planned').textContent = planned + ongoing;
+            }
+        }
+
+        // Event listeners
+        document.getElementById('searchInput').addEventListener('input', renderData);
+        document.getElementById('statusFilter').addEventListener('change', renderData);
+        document.getElementById('yearFilter').addEventListener('change', renderData);
+
+        // Initialize the application
+        document.addEventListener('DOMContentLoaded', function() {
+            addRefreshButton();
+            loadAllData();
         });
-      })
-      .catch(err => {
-        document.getElementById("error").textContent = `Error loading documents: ${err.message}`;
-        console.error("Error loading documents:", err);
-      });
-  </script>
+    </script>
 </body>
 </html>
