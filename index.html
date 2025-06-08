@@ -258,6 +258,24 @@
             font-weight: 500;
         }
 
+        .goal-tag.goal-a {
+            background: #dbeafe;
+            border-color: #3b82f6;
+            color: #1e40af;
+        }
+
+        .goal-tag.goal-b {
+            background: #d1fae5;
+            border-color: #10b981;
+            color: #065f46;
+        }
+
+        .goal-tag.goal-c {
+            background: #fef3c7;
+            border-color: #f59e0b;
+            color: #92400e;
+        }
+
         .status-completed {
             background: #d1fae5;
             color: #065f46;
@@ -274,6 +292,17 @@
             background: #dbeafe;
             color: #1e40af;
             border-color: #bfdbfe;
+        }
+
+        .section-description {
+            background: #f0f9ff;
+            border-left: 4px solid #3b82f6;
+            padding: 16px 20px;
+            margin: 24px 0;
+            border-radius: 8px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #1e40af;
         }
 
         .summary-stats {
@@ -345,7 +374,6 @@
         }
 
         .delmal-code {
-            background: #3b82f6;
             color: white;
             padding: 8px 12px;
             border-radius: 8px;
@@ -353,6 +381,18 @@
             font-size: 14px;
             min-width: 40px;
             text-align: center;
+        }
+
+        .delmal-code.category-a {
+            background: #3b82f6;
+        }
+
+        .delmal-code.category-b {
+            background: #10b981;
+        }
+
+        .delmal-code.category-c {
+            background: #f59e0b;
         }
 
         .delmal-title {
@@ -556,6 +596,10 @@
                 </div>
             </div>
 
+            <div class="section-description">
+                Översikt av alla delmål enligt målbeskrivningar för ST 2015 och mina aktuella avklarade kurser och placeringar som uppfyller målen.
+            </div>
+
             <div class="delmal-cards" id="delmal-cards">
                 <!-- Data will be populated by JavaScript -->
             </div>
@@ -579,6 +623,10 @@
                     <div class="stat-number" id="kurser-planned">2</div>
                     <div class="stat-label">Planerade</div>
                 </div>
+            </div>
+
+            <div class="section-description">
+                Översikt av avklarade, pågående och planerade kurser och deras respektiva delmål med länk till relevanta kursintyg.
             </div>
 
             <table class="data-table" id="kurser-table">
@@ -618,6 +666,10 @@
                 </div>
             </div>
 
+            <div class="section-description">
+                Avklarade, pågående och planerade placeringar med länk till respektiva tjänstgöringsintyg.
+            </div>
+
             <table class="data-table" id="placeringar-table">
                 <thead>
                     <tr>
@@ -653,6 +705,10 @@
                     <div class="stat-number" id="laslista-planned">0</div>
                     <div class="stat-label">Planerade</div>
                 </div>
+            </div>
+
+            <div class="section-description">
+                Källor till olika media för kontinuerlig utbildning och självstyrd inlärning.
             </div>
 
             <table class="data-table" id="laslista-table">
@@ -691,6 +747,10 @@
                     <div class="stat-number" id="portfolio-planned">3</div>
                     <div class="stat-label">Planerade</div>
                 </div>
+            </div>
+
+            <div class="section-description">
+                Dokumentation för kontinuerlig bedömning under utbildning.
             </div>
 
             <table class="data-table" id="portfolio-table">
@@ -1239,9 +1299,10 @@
                 `<a href="${item.länk}" target="_blank" class="link-button">Visa certifikat</a>` : 
                 '<span style="color: #94a3b8;">Ingen länk</span>';
             
-            const goalsHtml = item.delmål.map(goal => 
-                `<span class="goal-tag">${goal}</span>`
-            ).join('');
+            const goalsHtml = item.delmål.map(goal => {
+                const category = goal.charAt(0).toLowerCase();
+                return `<span class="goal-tag goal-${category}">${goal}</span>`;
+            }).join('');
 
             return `
                 <tr>
@@ -1260,9 +1321,10 @@
                 `<a href="${item.länk}" target="_blank" class="link-button">Visa intyg</a>` : 
                 '<span style="color: #94a3b8;">Ingen länk</span>';
             
-            const goalsHtml = item.delmål.map(goal => 
-                `<span class="goal-tag">${goal}</span>`
-            ).join('');
+            const goalsHtml = item.delmål.map(goal => {
+                const category = goal.charAt(0).toLowerCase();
+                return `<span class="goal-tag goal-${category}">${goal}</span>`;
+            }).join('');
 
             return `
                 <tr>
@@ -1281,9 +1343,10 @@
                 `<a href="${item.länk}" target="_blank" class="link-button">Visa länk</a>` : 
                 '<span style="color: #94a3b8;">Ingen länk</span>';
             
-            const goalsHtml = item.delmål.map(goal => 
-                `<span class="goal-tag">${goal}</span>`
-            ).join('');
+            const goalsHtml = item.delmål.map(goal => {
+                const category = goal.charAt(0).toLowerCase();
+                return `<span class="goal-tag goal-${category}">${goal}</span>`;
+            }).join('');
 
             const typeBadge = `<span class="type-badge type-${item.typ.toLowerCase().replace(/[åäö\s]/g, '')}">${item.typ}</span>`;
 
@@ -1312,7 +1375,7 @@
             return `
                 <div class="delmal-card category-${item.kategori}">
                     <div class="delmal-header">
-                        <div class="delmal-code">${item.kod}</div>
+                        <div class="delmal-code category-${item.kategori}">${item.kod}</div>
                         <div class="delmal-title">${item.titel}</div>
                     </div>
                     <div class="delmal-description">${item.beskrivning}</div>
