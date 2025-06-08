@@ -259,21 +259,21 @@
         }
 
         .goal-tag.goal-a {
-            background: #dbeafe;
-            border-color: #3b82f6;
-            color: #1e40af;
+            background: #f1f5f9;
+            border-color: #64748b;
+            color: #334155;
         }
 
         .goal-tag.goal-b {
-            background: #d1fae5;
-            border-color: #10b981;
-            color: #065f46;
+            background: #f0fdfa;
+            border-color: #14b8a6;
+            color: #0f766e;
         }
 
         .goal-tag.goal-c {
-            background: #fef3c7;
-            border-color: #f59e0b;
-            color: #92400e;
+            background: #fef7ed;
+            border-color: #f97316;
+            color: #c2410c;
         }
 
         .status-completed {
@@ -355,15 +355,15 @@
         }
 
         .delmal-card.category-a {
-            border-left-color: #3b82f6;
+            border-left-color: #64748b;
         }
 
         .delmal-card.category-b {
-            border-left-color: #10b981;
+            border-left-color: #14b8a6;
         }
 
         .delmal-card.category-c {
-            border-left-color: #f59e0b;
+            border-left-color: #f97316;
         }
 
         .delmal-header {
@@ -384,15 +384,15 @@
         }
 
         .delmal-code.category-a {
-            background: #3b82f6;
+            background: #64748b;
         }
 
         .delmal-code.category-b {
-            background: #10b981;
+            background: #14b8a6;
         }
 
         .delmal-code.category-c {
-            background: #f59e0b;
+            background: #f97316;
         }
 
         .delmal-title {
@@ -519,17 +519,43 @@
                 padding: 20px;
             }
             
+            /* Mobile-optimized table */
             .data-table {
                 font-size: 12px;
+                display: block;
+                overflow-x: auto;
+                white-space: nowrap;
+                -webkit-overflow-scrolling: touch;
             }
             
             .data-table th, .data-table td {
-                padding: 12px 8px;
+                padding: 8px 6px;
+                min-width: 100px;
+            }
+            
+            .data-table th:first-child,
+            .data-table td:first-child {
+                position: sticky;
+                left: 0;
+                background: white;
+                z-index: 2;
+            }
+            
+            .data-table th:first-child {
+                background: #f9fafb;
             }
             
             .summary-stats {
-                grid-template-columns: 1fr;
-                gap: 16px;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+            
+            .stat-card {
+                padding: 16px;
+            }
+            
+            .stat-number {
+                font-size: 1.8rem;
             }
             
             .delmal-cards {
@@ -537,8 +563,188 @@
                 gap: 16px;
             }
             
+            .delmal-card {
+                padding: 16px;
+            }
+            
             .category-filter {
                 justify-content: center;
+                gap: 8px;
+            }
+            
+            .category-btn {
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+            
+            .section-description {
+                padding: 12px 16px;
+                font-size: 13px;
+                margin: 16px 0;
+            }
+            
+            .goals-list {
+                gap: 4px;
+            }
+            
+            .goal-tag {
+                font-size: 10px;
+                padding: 3px 6px;
+            }
+            
+            .type-badge {
+                font-size: 10px;
+                padding: 3px 8px;
+            }
+            
+            .link-button {
+                font-size: 11px;
+                padding: 6px 12px;
+            }
+        }
+
+        /* iPad and larger tablets */
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .container {
+                padding: 20px;
+            }
+            
+            .summary-stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 16px;
+            }
+            
+            .delmal-cards {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .nav-tab {
+                padding: 10px 16px;
+                font-size: 13px;
+            }
+            
+            .data-table {
+                font-size: 13px;
+            }
+            
+            .data-table th, .data-table td {
+                padding: 12px 10px;
+            }
+        }
+
+        /* Very small phones */
+        @media (max-width: 480px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .header p {
+                font-size: 1rem;
+            }
+            
+            .summary-stats {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            .stat-card {
+                padding: 12px;
+            }
+            
+            .stat-number {
+                font-size: 1.5rem;
+            }
+            
+            .nav-tab {
+                padding: 10px 12px;
+                font-size: 12px;
+            }
+            
+            .search-filter {
+                padding: 16px;
+            }
+            
+            .content-section {
+                padding: 16px;
+            }
+            
+            .data-table th, .data-table td {
+                padding: 6px 4px;
+                min-width: 80px;
+            }
+            
+            .delmal-card {
+                padding: 12px;
+            }
+            
+            .delmal-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .delmal-code {
+                align-self: flex-start;
+            }
+            
+            .section-description {
+                padding: 10px 12px;
+                font-size: 12px;
+            }
+        }
+
+        /* Landscape phone optimization */
+        @media (max-width: 896px) and (orientation: landscape) {
+            .summary-stats {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 10px;
+            }
+            
+            .stat-card {
+                padding: 12px 8px;
+            }
+            
+            .stat-number {
+                font-size: 1.4rem;
+            }
+            
+            .stat-label {
+                font-size: 0.75rem;
+            }
+        }
+
+        /* Touch-friendly improvements */
+        @media (hover: none) and (pointer: coarse) {
+            .nav-tab {
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .link-button {
+                min-height: 44px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                padding: 8px 16px;
+            }
+            
+            .category-btn {
+                min-height: 44px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            #refresh-btn {
+                min-height: 44px;
+                padding: 12px 24px;
+            }
+            
+            .search-input, .filter-select {
+                min-height: 44px;
             }
         }
     </style>
