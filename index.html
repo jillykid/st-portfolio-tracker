@@ -215,6 +215,11 @@
             color: #14532d;
         }
 
+        .type-podd {
+            background: #f0fdf4;
+            color: #14532d;
+        }
+
         .type-video {
             background: #fefce8;
             color: #854d0e;
@@ -223,6 +228,61 @@
         .type-webinar {
             background: #f5f3ff;
             color: #5b21b6;
+        }
+
+        .type-substack {
+            background: #ffedd5;
+            color: #9a3412;
+        }
+
+        .type-blogg {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .type-blog {
+            background: #e0e7ff;
+            color: #3730a3;
+        }
+
+        .type-kurs {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .type-tidskrift {
+            background: #f3e8ff;
+            color: #6b21a8;
+        }
+
+        .type-rapport {
+            background: #fce7f3;
+            color: #9f1239;
+        }
+
+        .type-guideline {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .type-riktlinje {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .type-forskningsartikel {
+            background: #cffafe;
+            color: #164e63;
+        }
+
+        .type-oversikt {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .type-fallbeskrivning {
+            background: #ede9fe;
+            color: #6b21a8;
         }
 
         .link-button {
@@ -897,23 +957,8 @@
             </div>
         </div>
 
-        <!-- Reading List Section -->
+        <!-- Reading List Section - SIMPLIFIED -->
         <div class="content-section" id="laslista-section">
-            <div class="summary-stats">
-                <div class="stat-card">
-                    <div class="stat-number" id="laslista-total">0</div>
-                    <div class="stat-label">Totalt läsning</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="laslista-completed">0</div>
-                    <div class="stat-label">Genomförda</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="laslista-planned">0</div>
-                    <div class="stat-label">Planerade</div>
-                </div>
-            </div>
-
             <div class="section-description">
                 Källor till olika media för kontinuerlig utbildning och självstyrd inlärning.
             </div>
@@ -925,9 +970,7 @@
                         <th>Titel</th>
                         <th>Författare/Källa</th>
                         <th>Datum</th>
-                        <th>Delmål</th>
                         <th>Länk</th>
-                        <th>Anteckningar</th>
                     </tr>
                 </thead>
                 <tbody id="laslista-tbody">
@@ -1248,7 +1291,7 @@
                 return parseCSV(csvText);
             } catch (error) {
                 console.error('Error fetching sheet data:', error);
-                return null; // Return null instead of empty array to distinguish from empty sheet
+                return null;
             }
         }
 
@@ -1302,19 +1345,15 @@
                     titel: "Kaplan & Sadock's Synopsis of Psychiatry",
                     författare: "Benjamin J. Sadock",
                     datum: "2024-03-15",
-                    delmål: ["c1", "c2"],
                     länk: "",
-                    anteckningar: "Grundläggande psykiatri",
                     status: "completed"
                 },
                 {
-                    typ: "Podcast",
+                    typ: "Podd",
                     titel: "The Carlat Psychiatry Podcast",
                     författare: "Carlat Publishing",
                     datum: "2024-06-01",
-                    delmål: ["c4"],
                     länk: "https://thecarlatreport.com/podcast/",
-                    anteckningar: "Psykofarmakologi",
                     status: "ongoing"
                 }
             ],
@@ -1369,7 +1408,7 @@
             })).filter(item => item.titel);
         }
 
-        // Process läslista data
+        // Process läslista data - SIMPLIFIED VERSION
         function processLaslistaData(rawData) {
             console.log('Raw Läslista data:', rawData);
             console.log('First row headers:', rawData.length > 0 ? Object.keys(rawData[0]) : 'No data');
@@ -1381,9 +1420,7 @@
                     titel: row.titel || '',
                     författare: row['författare/källa'] || row.författare || row.källa || '',
                     datum: row.datum || '',
-                    delmål: parseDelmål(row.delmål),
                     länk: row.länk || '',
-                    anteckningar: row.anteckningar || '',
                     status: determineStatus(row.datum, row.anteckningar)
                 };
             }).filter(item => item.titel);
@@ -1714,15 +1751,11 @@
             `;
         }
 
+        // SIMPLIFIED renderLaslistaRow - removed Delmål and Anteckningar columns
         function renderLaslistaRow(item) {
             const linkCell = item.länk ? 
                 `<a href="${item.länk}" target="_blank" class="link-button">Visa länk</a>` : 
                 '<span style="color: #94a3b8;">Ingen länk</span>';
-            
-            const goalsHtml = item.delmål.map(goal => {
-                const category = goal.charAt(0).toLowerCase();
-                return `<span class="goal-tag goal-${category}">${goal}</span>`;
-            }).join('');
 
             const typeBadge = `<span class="type-badge type-${item.typ.toLowerCase().replace(/[åäö\s]/g, '')}">${item.typ}</span>`;
 
@@ -1732,9 +1765,7 @@
                     <td><strong>${item.titel}</strong></td>
                     <td>${item.författare}</td>
                     <td>${item.datum}</td>
-                    <td><div class="goals-list">${goalsHtml}</div></td>
                     <td>${linkCell}</td>
-                    <td>${item.anteckningar}</td>
                 </tr>
             `;
         }
@@ -1790,10 +1821,11 @@
                     item.titel.toLowerCase().includes(searchTerm) ||
                     (item.ansvarig && item.ansvarig.toLowerCase().includes(searchTerm)) ||
                     (item.anteckningar && item.anteckningar.toLowerCase().includes(searchTerm)) ||
-                    (item.beskrivning && item.beskrivning.toLowerCase().includes(searchTerm));
+                    (item.beskrivning && item.beskrivning.toLowerCase().includes(searchTerm)) ||
+                    (item.författare && item.författare.toLowerCase().includes(searchTerm));
                 
                 const matchesStatus = !statusFilter || item.status === statusFilter;
-                const matchesYear = !yearFilter || (item.period && item.period.includes(yearFilter));
+                const matchesYear = !yearFilter || (item.period && item.period.includes(yearFilter)) || (item.datum && item.datum.includes(yearFilter));
                 const matchesCategory = currentSection !== 'delmal' || currentCategory === 'all' || item.kategori === currentCategory;
                 
                 return matchesSearch && matchesStatus && matchesYear && matchesCategory;
@@ -1880,7 +1912,8 @@
                 document.getElementById('delmal-a').textContent = delmalData.filter(item => item.kategori === 'a').length;
                 document.getElementById('delmal-b').textContent = delmalData.filter(item => item.kategori === 'b').length;
                 document.getElementById('delmal-c').textContent = delmalData.filter(item => item.kategori === 'c').length;
-            } else {
+            } else if (currentSection !== 'laslista') {
+                // Stats for other sections (but not läslista)
                 const completed = currentData.filter(item => item.status === 'completed').length;
                 const planned = currentData.filter(item => item.status === 'planned').length;
                 const ongoing = currentData.filter(item => item.status === 'ongoing').length;
@@ -1889,6 +1922,7 @@
                 document.getElementById(currentSection + '-completed').textContent = completed;
                 document.getElementById(currentSection + '-planned').textContent = planned + ongoing;
             }
+            // No stats update for läslista section
         }
 
         // Event listeners
