@@ -245,6 +245,23 @@
     return main.length >= 3 ? out : null;
   }
 
+  // En egen färg per placering (som originalets tidslinje). Samma namn = samma färg.
+  const COLORS = [
+    [/^piva/i, "#3182ce"], [/psykakut/i, "#38a169"], [/^ect/i, "#805ad5"], [/kvalitet|^ka$/i, "#d69e2e"],
+    [/bipolär/i, "#dd6b20"], [/amanuens/i, "#e53e3e"], [/internmed/i, "#2c5282"], [/medakut/i, "#2f855a"],
+    [/^bup/i, "#6b46c1"], [/pdt/i, "#fde68a"], [/^bcm/i, "#00b5d8"], [/konsult|allmänpsykiatri sluten/i, "#319795"],
+    [/psykos sluten/i, "#d53f8c"], [/psykos öppen|nip/i, "#2b6cb0"], [/minnes/i, "#276749"],
+    [/allmänpsykiatri öppen/i, "#744210"], [/neurolog/i, "#9c4221"],
+  ];
+  const SPARE = ["#0987a0", "#b83280", "#2c7a7b", "#c05621", "#553c9a", "#2f855a", "#b7791f", "#4a5568"];
+  function colorFor(name) {
+    const hit = COLORS.find(([re]) => re.test(name.trim()));
+    if (hit) return hit[1];
+    let h = 0; for (const ch of name.toLowerCase()) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+    return SPARE[h % SPARE.length];
+  }
+  const isLight = (hex) => { const n = parseInt(hex.slice(1), 16); return ((n >> 16) * 299 + ((n >> 8) & 255) * 587 + (n & 255) * 114) / 1000 > 170; };
+
   const rotationAt = (rots, d) => rots.find((r) => r.lane === 0 && r.a <= d && d <= r.b);
 
   function renderTimeline(target, rots) {
@@ -261,12 +278,13 @@
         if (b <= ys || a >= ye) return;
         const s = Math.max(a, ys), e = Math.min(b, ye);
         const left = ((s - ys) / span) * 100, width = ((e - s) / span) * 100;
-        const cls = ["tl-bar", r.kind, "lane-" + r.lane];
+        const cls = ["tl-bar", "lane-" + r.lane];
+        const bg = colorFor(r.name);
         if (a > today) cls.push("future");
         if (r === cur && width > 2) cls.push("current");
         row.append(el("div", {
           class: cls.join(" "),
-          style: `left:calc(${left}% + 1px);width:calc(${width}% - 2px)`,
+          style: `left:calc(${left}% + 1px);width:calc(${width}% - 2px);background:${bg};color:${isLight(bg) ? "#78350f" : "#fff"}`,
           title: r.name + ": " + fmtRange(r.a, r.b),
           text: width > 6 ? r.name : "",
         }));
@@ -274,11 +292,8 @@
       if (today >= ys && today < ye) row.append(el("div", { class: "tl-today", style: `left:${((today - ys) / span) * 100}%` }));
       tl.append(el("div", { class: "tl-year", text: y }), row);
     }
-    const legend = el("div", { class: "legend" },
-      [["psyk", "Psykiatri"], ["somatik", "Somatik"], ["ovrigt", "Forskning/övrigt"], ["parallell", "Parallellt"]]
-        .map(([k, label]) => el("span", null, el("i", { class: "sw-" + k }), label)));
     const scroller = el("div", { class: "tl-scroll" }, tl);
-    target.replaceChildren(scroller, legend);
+    target.replaceChildren(scroller);
     const mark = tl.querySelector(".tl-today");
     if (mark && scroller.scrollWidth > scroller.clientWidth) {
       scroller.scrollLeft = mark.getBoundingClientRect().left - scroller.getBoundingClientRect().left - scroller.clientWidth / 2;

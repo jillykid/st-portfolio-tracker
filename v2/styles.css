@@ -131,7 +131,7 @@ a.stat:hover { border-color: var(--blue); transform: translateY(-1px); }
 .tl-months span { text-align: center; text-transform: capitalize; }
 .tl-year { font-weight: 600; font-size: 15px; color: #2d3748; align-self: center; }
 .tl-row { position: relative; height: 68px; border-radius: 6px; background: repeating-linear-gradient(90deg, #f7fafc 0, #f7fafc calc(100% / 12 - 1px), var(--line) calc(100% / 12 - 1px), var(--line) calc(100% / 12)); border: 1px solid var(--line); }
-.tl-bar { position: absolute; height: 28px; border-radius: 4px; padding: 0 6px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 500; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tl-bar { position: absolute; height: 28px; line-height: 28px; text-align: center; border-radius: 4px; padding: 0 6px; display: block; font-size: 12px; font-weight: 500; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tl-bar.lane-0 { top: 5px; }
 .tl-bar.lane-1 { top: 36px; }
 .tl-bar.psyk, .sw-psyk { background: #3182ce; }
