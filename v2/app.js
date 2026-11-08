@@ -260,6 +260,9 @@
     let h = 0; for (const ch of name.toLowerCase()) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
     return SPARE[h % SPARE.length];
   }
+  // Korta namn för smala staplar
+  const SHORT = [[/kvalitet/i, "KA"], [/psykos öppen|nip/i, "NIP"], [/allmänpsykiatri öppen/i, "Allmänpsyk"], [/minnes/i, "Minnes"], [/bipolär/i, "Bipolär"], [/psykakut/i, "Psykakut"]];
+  const shortName = (n) => { const hit = SHORT.find(([re]) => re.test(n)); return hit ? hit[1] : n; };
   const isLight = (hex) => { const n = parseInt(hex.slice(1), 16); return ((n >> 16) * 299 + ((n >> 8) & 255) * 587 + (n & 255) * 114) / 1000 > 170; };
 
   const rotationAt = (rots, d) => rots.find((r) => r.lane === 0 && r.a <= d && d <= r.b);
@@ -286,7 +289,7 @@
           class: cls.join(" "),
           style: `left:calc(${left}% + 1px);width:calc(${width}% - 2px);background:${bg};color:${isLight(bg) ? "#78350f" : "#fff"}`,
           title: r.name + ": " + fmtRange(r.a, r.b),
-          text: width > 6 ? r.name : "",
+          text: width > 6 && r.name.length * 0.62 < width * 1.6 ? r.name : width > 2.5 ? shortName(r.name) : "",
         }));
       });
       if (today >= ys && today < ye) row.append(el("div", { class: "tl-today", style: `left:${((today - ys) / span) * 100}%` }));
