@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Placeringar – ST-portfölj Psykiatri</title>
+  <meta name="description" content="Kliniska placeringar med handledare, uppfyllda delmål och tjänstgöringsintyg.">
+  <meta name="theme-color" content="#1E5B4F">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=1">
+</head>
+<body data-page="placeringar">
+  <header class="wrap site-header">
+    <a class="brand" href="index.html">
+      <img src="favicon.svg" width="40" height="40" alt="">
+      <span class="brand-name">ST-portfölj</span>
+    </a>
+    <nav class="nav" aria-label="Huvudmeny">
+      <a href="index.html">Översikt</a>
+      <a href="delmal.html">Delmål</a>
+      <a href="placeringar.html" aria-current="page">Placeringar</a>
+      <a href="kurser.html">Kurser</a>
+      <a href="bedomningar.html">Bedömningar</a>
+      <a href="laslista.html">Läslista</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <section class="page-head">
+      <h1>Placeringar</h1>
+      <p>Kliniska placeringar med handledare, uppfyllda delmål och tjänstgöringsintyg.</p>
+    </section>
+    <section class="stack">
+      <div class="toolbar">
+        <label class="search"><span aria-hidden="true">⌕</span><span class="sr-only">Sök</span><input id="q" type="search" placeholder="Sök placering, handledare eller delmål…" autocomplete="off"></label>
+        <div class="filters" id="filters" role="group" aria-label="Filter"></div>
+      </div>
+      <ul class="list" id="list" aria-live="polite">
+        <li class="item skeleton" style="height:110px"></li>
+        <li class="item skeleton" style="height:110px"></li>
+        <li class="item skeleton" style="height:110px"></li>
+      </ul>
+    </section>
+  </main>
+
+  <footer class="wrap site-footer">
+    <span>Specialiseringstjänstgöring i psykiatri · målbeskrivning SOSFS 2015:8</span>
+    <button class="refresh" type="button" data-refresh>Hämta senaste från arket</button>
+  </footer>
+
+  <script src="app.js?v=1"></script>
+</body>
+</html>

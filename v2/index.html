@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ST-portfölj – Psykiatri</title>
+  <meta name="description" content="Min ST-portfölj i psykiatri: placeringar, delmål, kurser och bedömningar.">
+  <meta name="theme-color" content="#1E5B4F">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css?v=1">
+</head>
+<body data-page="home">
+  <header class="wrap site-header">
+    <a class="brand" href="index.html">
+      <img src="favicon.svg" width="40" height="40" alt="">
+      <span class="brand-name">ST-portfölj</span>
+    </a>
+    <nav class="nav" aria-label="Huvudmeny">
+      <a href="index.html" aria-current="page">Översikt</a>
+      <a href="delmal.html">Delmål</a>
+      <a href="placeringar.html">Placeringar</a>
+      <a href="kurser.html">Kurser</a>
+      <a href="bedomningar.html">Bedömningar</a>
+      <a href="laslista.html">Läslista</a>
+    </nav>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div class="hero-text">
+        <span class="chip">ST-läkare i psykiatri · 2023–2028</span>
+        <h1>Min ST,<br>steg för steg.</h1>
+        <p class="lede">Utbildningsportfölj med placeringar, kurser och bedömningar – och hur de täcker delmålen i målbeskrivningen.</p>
+        <div class="btn-row">
+          <a class="btn btn-primary" href="delmal.html">Se delmålen</a>
+          <a class="btn btn-light" href="#tidslinje">Tidslinjen</a>
+        </div>
+      </div>
+      <article class="now-card" id="now-card" aria-live="polite">
+        <div class="now-top"><span class="eyebrow">Just nu</span></div>
+        <div class="now-body"><div class="skeleton" style="height:120px"></div></div>
+      </article>
+    </section>
+
+    <section class="stats" id="stats" aria-label="Sammanfattning">
+      <div class="stat skeleton" style="height:120px"></div>
+      <div class="stat skeleton" style="height:120px"></div>
+      <div class="stat skeleton" style="height:120px"></div>
+      <div class="stat skeleton" style="height:120px"></div>
+    </section>
+
+    <section class="stack" id="tidslinje" aria-labelledby="h-tl">
+      <div class="section-head">
+        <h2 id="h-tl">Tidslinje</h2>
+        <a href="placeringar.html">Alla placeringar →</a>
+      </div>
+      <div class="timeline-card" id="timeline"></div>
+    </section>
+
+    <section class="banner" id="missing" hidden>
+      <div>
+        <h2>Kvar att täcka</h2>
+        <p>Delmål som ännu saknar kopplad placering eller kurs.</p>
+        <div class="tags" id="missing-tags"></div>
+      </div>
+      <a class="btn btn-peach" href="delmal.html">Till delmålen</a>
+    </section>
+  </main>
+
+  <footer class="wrap site-footer">
+    <span>Specialiseringstjänstgöring i psykiatri · målbeskrivning SOSFS 2015:8</span>
+    <button class="refresh" type="button" data-refresh>Hämta senaste från arket</button>
+  </footer>
+
+  <script src="app.js?v=1"></script>
+</body>
+</html>
