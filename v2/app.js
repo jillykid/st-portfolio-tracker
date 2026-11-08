@@ -29,7 +29,7 @@
     { name: "BUP", from: "2025-12-01", to: "2026-03-29", kind: "psyk" },
     { name: "PDT-utbildning", from: "2026-01-01", to: "2027-12-31", kind: "parallell" },
     { name: "BCM", from: "2026-03-30", to: "2026-08-02", kind: "psyk" },
-    { name: "Allmänpsykiatri slutenvård", from: "2026-08-03", to: "2026-10-04", kind: "psyk" },
+    { name: "ST konsultläkare", from: "2026-08-03", to: "2026-10-04", kind: "psyk" },
     { name: "Psykos slutenvård", from: "2026-10-05", to: "2027-01-03", kind: "psyk" },
     { name: "Psykos öppenvård/NIP", from: "2027-01-04", to: "2027-03-28", kind: "psyk" },
     { name: "Minnesmottagning", from: "2027-03-29", to: "2027-07-04", kind: "psyk" },
