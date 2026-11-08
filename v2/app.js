@@ -93,28 +93,32 @@
   }
 
   const pick = (row, ...keys) => { for (const k of keys) if (row[k]) return row[k]; return ""; };
-  const blank = (v) => (/^(\.\.\.|-|tba|tbd)?$/i.test(String(v || "").trim()) ? "" : String(v).trim());
+  const blank = (v) => (/^(\.\.\.|-+|tba|tbd)?$/i.test(String(v || "").trim()) ? "" : String(v).trim());
 
   /* ---------- Dates & status ---------- */
   function iso(s) { const [y, m, d] = s.split("-").map(Number); return new Date(y, m - 1, d); }
 
   // "240301-240531", "230901-231130 and 240301-240631", "2024-03-15", "2024"
+  // Datum hålls i den ordning de står i arket och paras ihop två och två.
+  // "270901-" (öppet slut) blir { openEnd: true }.
   function parsePeriod(text) {
     const s = String(text || "");
-    const dates = [];
-    for (const m of s.matchAll(/(\d{4})-(\d{2})-(\d{2})/g)) dates.push(new Date(+m[1], +m[2] - 1, +m[3]));
+    const found = [];
+    for (const m of s.matchAll(/(\d{4})-(\d{2})-(\d{2})/g)) found.push([m.index, new Date(+m[1], +m[2] - 1, +m[3])]);
     for (const m of s.matchAll(/(?<!\d)(\d{2})(\d{2})(\d{2})(?!\d)/g)) {
-      const mo = +m[2], d = +m[3];
-      if (mo >= 1 && mo <= 12 && d >= 1 && d <= 31) dates.push(new Date(2000 + +m[1], mo - 1, Math.min(d, new Date(2000 + +m[1], mo, 0).getDate())));
+      const y = 2000 + +m[1], mo = +m[2], d = +m[3];
+      if (mo >= 1 && mo <= 12 && d >= 1 && d <= 31) found.push([m.index, new Date(y, mo - 1, Math.min(d, new Date(y, mo, 0).getDate()))]);
     }
-    if (dates.length) {
-      dates.sort((a, b) => a - b);
+    if (found.length) {
+      const dates = found.sort((a, b) => a[0] - b[0]).map((x) => x[1]);
       const ranges = [];
-      for (let i = 0; i < dates.length; i += 2) ranges.push([dates[i], dates[i + 1] || dates[i]]);
-      return { start: dates[0], end: dates[dates.length - 1], ranges };
+      for (let i = 0; i < dates.length; i += 2) ranges.push([dates[i], dates[i + 1] || null]);
+      const all = dates.slice().sort((a, b) => a - b);
+      const openEnd = ranges[ranges.length - 1][1] === null && /\d\s*-\s*$/.test(s.trim());
+      return { start: all[0], end: openEnd ? null : all[all.length - 1], ranges, openEnd };
     }
-    const y = s.match(/\b(20\d{2})\b/);
-    if (y) return { start: new Date(+y[1], 0, 1), end: new Date(+y[1], 11, 31), ranges: [], yearOnly: +y[1] };
+    const ys = [...s.matchAll(/\b((?:19|20)\d{2})\b/g)].map((m) => +m[1]);
+    if (ys.length) return { start: new Date(Math.min(...ys), 0, 1), end: new Date(Math.max(...ys), 11, 31), ranges: [], yearOnly: true };
     return null;
   }
 
@@ -124,20 +128,32 @@
     return a.getFullYear() === b.getFullYear() ? fmtDate(a, false) + " – " + fmtDate(b) : fmtDate(a) + " – " + fmtDate(b);
   }
   function fmtPeriod(p, raw) {
-    if (!p) return blank(raw) || "Ej planerat datum";
-    if (p.yearOnly) return String(p.yearOnly);
-    return p.ranges.map(([a, b]) => fmtRange(a, b)).join(" · ");
+    if (!p) return blank(String(raw || "").replace(/^-+$/, "")) || "Utan datum";
+    if (p.yearOnly) return clean(raw).replace(/\s*-\s*/, "–");
+    return p.ranges.map(([a, b]) => (b ? fmtRange(a, b) : (p.openEnd ? "från " : "") + fmtDate(a))).join(" · ");
   }
+  function clean(v) { return String(v || "").replace(/\s+/g, " ").trim(); }
 
-  function statusOf(p, note) {
+  // Exakta datum i arket avgör status. Anteckningen ("planerad", "pågående")
+  // används bara när det saknas exakta datum.
+  function statusOf(p, note, hasLink) {
     const n = String(note || "").toLowerCase();
-    if (n.includes("planerad")) return "planned";
+    const yr = today.getFullYear();
+    if (p && !p.yearOnly) {
+      if (p.start > today) return "planned";
+      if (p.openEnd || (p.end && p.end >= today)) return "ongoing";
+      return "completed";
+    }
+    if (p && p.yearOnly) {
+      if (p.end.getFullYear() < yr) return "completed";
+      if (p.start.getFullYear() > yr) return "planned";
+      if (n.includes("planerad")) return "planned";
+      if (n.includes("pågående")) return "ongoing";
+      return "completed";
+    }
+    if (n.includes("tillgodoräkn") || hasLink) return "completed";
     if (n.includes("pågående")) return "ongoing";
-    if (!p) return "planned";
-    if (p.yearOnly) return p.yearOnly < today.getFullYear() ? "completed" : p.yearOnly > today.getFullYear() ? "planned" : "completed";
-    if (p.end < today) return "completed";
-    if (p.start > today) return "planned";
-    return "ongoing";
+    return "planned";
   }
   const STATUS_LABEL = { completed: "Genomförd", ongoing: "Pågående", planned: "Planerad" };
   const STATUS_ORDER = { ongoing: 0, planned: 1, completed: 2 };
@@ -148,14 +164,18 @@
   }
 
   const codes = (v) => blank(v) ? String(v).split(/[,;\s]+/).map((c) => c.trim().toLowerCase()).filter((c) => /^[abc]\d+$/.test(c)) : [];
-  const list = (v) => blank(v) ? String(v).split(",").map((s) => s.trim()).filter((s) => blank(s)) : [];
+  const list = (v) => blank(v) ? String(v).split(",").map((s) => clean(s)).filter((s) => blank(s)) : [];
 
   /* ---------- Normalise sheets ---------- */
   function normItems(rows, kind) {
     return rows.map((r) => {
       const period = pick(r, "tidsperiod", "period", "datum");
-      const note = blank(pick(r, "anteckningar"));
+      const rawNote = blank(pick(r, "anteckningar"));
       const p = parsePeriod(period);
+      const lank = safeURL(pick(r, "länk"));
+      const status = statusOf(p, rawNote, !!lank);
+      // En ensam "planerad"/"pågående" i anteckningen visas inte – statusen syns ändå
+      const note = /^(planerad|pågående)$/i.test(rawNote) ? "" : rawNote;
       return {
         kind,
         typ: blank(pick(r, "typ")),
@@ -163,9 +183,8 @@
         ansvarig: blank(pick(r, "ansvarig/bedömare", "ansvarig", "bedömare")),
         forfattare: blank(pick(r, "författare/källa", "författare", "källa")),
         delmal: codes(pick(r, "delmål")),
-        lank: safeURL(pick(r, "länk")),
-        note, raw: period, p,
-        status: statusOf(p, note),
+        lank, note, raw: period, p, status,
+        noCert: (kind === "kurs" || kind === "placering") && status === "completed" && !lank,
       };
     }).filter((x) => x.titel).sort(sortItems);
   }
@@ -177,14 +196,15 @@
         kod, kat: kod.charAt(0),
         titel: blank(pick(r, "titel")),
         beskrivning: blank(pick(r, "beskrivningar", "beskrivning")),
-        kurser: list(pick(r, "kursintyg")),
+        noCourseReq: /ingen kurskrav|inget kurskrav/i.test(pick(r, "kursintyg")),
+        kurser: list(pick(r, "kursintyg")).filter((k) => !/kurskrav/i.test(k)),
         placeringar: list(pick(r, "tjänstgöringsintyg")),
       };
     }).filter((g) => /^[abc]\d+$/.test(g.kod));
-    // Lägg till kopplingar från Kurser/Placeringar (endast genomförda/pågående)
+    // Lägg till kopplingar från Kurser/Placeringar (endast genomförda)
     const byCode = Object.fromEntries(goals.map((g) => [g.kod, g]));
     const addFrom = (items, field) => items.forEach((it) => {
-      if (it.status === "planned") return;
+      if (it.status !== "completed") return;
       it.delmal.forEach((c) => { const g = byCode[c]; if (g && !g[field].some((t) => t.toLowerCase() === it.titel.toLowerCase())) g[field].push(it.titel); });
     });
     addFrom(kurser || [], "kurser");
@@ -206,37 +226,57 @@
   }
 
   /* ---------- Timeline ---------- */
-  function rotationAt(d) { return ROTATIONS.find((r) => r.kind !== "parallell" && iso(r.from) <= d && d <= iso(r.to)); }
+  // Rotationer: { name, a, b (sista dagen), kind, lane }
+  const fallbackRots = ROTATIONS.map((r) => ({ name: r.name, a: iso(r.from), b: iso(r.to), kind: r.kind, lane: r.kind === "parallell" ? 1 : 0 }));
+  const kindOf = (n) => /intern|medakut|neurolog|kirurg|somat|allmänmed/i.test(n) ? "somatik" : /amanuens|vetenskap|forskning/i.test(n) ? "ovrigt" : "psyk";
 
-  function renderTimeline(target) {
-    const y0 = iso(CONFIG.stStart).getFullYear(), y1 = iso(CONFIG.stEnd).getFullYear();
+  // Bygger tidslinjen från fliken Tjänstgöringsintyg (+ långa kurser som PDT som parallellt spår)
+  function rotsFromSheet(plac, kurser) {
+    const out = [];
+    plac.forEach((it) => it.p && !it.p.yearOnly && it.p.ranges.forEach(([a, b]) => { if (b && b >= a) out.push({ name: it.titel, a, b, kind: kindOf(it.titel) }); }));
+    kurser.forEach((it) => it.p && !it.p.yearOnly && it.p.ranges.forEach(([a, b]) => { if (b && (b - a) / DAY > 180) out.push({ name: /pdt/i.test(it.titel) ? "PDT-utbildning" : it.titel, a, b, kind: "parallell", lane: 1 }); }));
+    out.sort((x, y) => x.a - y.a);
+    const main = [];
+    out.forEach((r) => {
+      if (r.lane === 1) return;
+      const clash = main.some((m) => Math.min(+m.b, +r.b) - Math.max(+m.a, +r.a) > 7 * DAY);
+      if (clash) { r.lane = 1; r.kind = "parallell"; } else { r.lane = 0; main.push(r); }
+    });
+    return main.length >= 3 ? out : null;
+  }
+
+  const rotationAt = (rots, d) => rots.find((r) => r.lane === 0 && r.a <= d && d <= r.b);
+
+  function renderTimeline(target, rots) {
+    const main = rots.filter((r) => r.lane === 0);
+    const y0 = Math.min(...main.map((r) => r.a.getFullYear())), y1 = Math.max(...main.map((r) => r.b.getFullYear()));
     const tl = el("div", { class: "tl", role: "img", "aria-label": "Tidslinje över placeringar " + y0 + "–" + y1 });
     tl.append(el("div"), el("div", { class: "tl-months" }, MONTH_SHORT.map((m) => el("span", { text: m }))));
-    const cur = rotationAt(today);
+    const cur = rotationAt(rots, today);
     for (let y = y0; y <= y1; y++) {
       const ys = new Date(y, 0, 1), ye = new Date(y + 1, 0, 1), span = ye - ys;
       const row = el("div", { class: "tl-row" });
-      ROTATIONS.forEach((r) => {
-        const a = iso(r.from), b = new Date(+iso(r.to) + DAY);
+      rots.forEach((r) => {
+        const a = r.a, b = new Date(+r.b + DAY);
         if (b <= ys || a >= ye) return;
         const s = Math.max(a, ys), e = Math.min(b, ye);
         const left = ((s - ys) / span) * 100, width = ((e - s) / span) * 100;
-        const cls = ["tl-bar", r.kind, r.kind === "parallell" ? "lane-1" : "lane-0"];
+        const cls = ["tl-bar", r.kind, "lane-" + r.lane];
         if (a > today) cls.push("future");
         if (r === cur && width > 2) cls.push("current");
         row.append(el("div", {
           class: cls.join(" "),
           style: `left:calc(${left}% + 1px);width:calc(${width}% - 2px)`,
-          title: r.name + ": " + fmtRange(a, iso(r.to)),
-          text: width > 4 ? r.name : "",
+          title: r.name + ": " + fmtRange(r.a, r.b),
+          text: width > 6 ? r.name : "",
         }));
       });
       if (today >= ys && today < ye) row.append(el("div", { class: "tl-today", style: `left:${((today - ys) / span) * 100}%` }));
       tl.append(el("div", { class: "tl-year", text: y }), row);
     }
     const legend = el("div", { class: "legend" },
-      [["psyk", "Psykiatri", "var(--primary)"], ["somatik", "Somatik", "var(--coral)"], ["ovrigt", "Forskning/övrigt", "var(--slate)"], ["parallell", "Parallellt", "var(--sand)"]]
-        .map(([, label, c]) => el("span", null, el("i", { style: "background:" + c }), label)));
+      [["psyk", "Psykiatri"], ["somatik", "Somatik"], ["ovrigt", "Forskning/övrigt"], ["parallell", "Parallellt"]]
+        .map(([k, label]) => el("span", null, el("i", { class: "sw-" + k }), label)));
     const scroller = el("div", { class: "tl-scroll" }, tl);
     target.replaceChildren(scroller, legend);
     const mark = tl.querySelector(".tl-today");
@@ -245,39 +285,45 @@
     }
   }
 
-  /* ---------- Page: Översikt ---------- */
-  async function pageHome() {
-    // Nu-kortet bygger på tidslinjen och fungerar utan arket
-    const cur = rotationAt(today);
-    const st0 = iso(CONFIG.stStart), st1 = iso(CONFIG.stEnd);
+  function renderNow(rots) {
+    const main = rots.filter((r) => r.lane === 0);
+    const st0 = new Date(Math.min(...main.map((r) => +r.a))), st1 = new Date(Math.max(...main.map((r) => +r.b)));
+    const cur = rotationAt(rots, today);
     const stPct = Math.min(100, Math.max(0, ((today - st0) / (st1 - st0)) * 100));
     const monthsTotal = Math.round((st1 - st0) / (30.44 * DAY));
     const monthsDone = Math.min(monthsTotal, Math.max(0, Math.floor((today - st0) / (30.44 * DAY)) + 1));
-    const next = ROTATIONS.filter((r) => r.kind !== "parallell" && iso(r.from) > today)[0];
-    const parallel = ROTATIONS.filter((r) => r.kind === "parallell" && iso(r.from) <= today && today <= iso(r.to));
+    const next = main.filter((r) => r.a > today)[0];
+    const parallel = rots.filter((r) => r.lane === 1 && r.a <= today && today <= r.b);
 
     const body = el("div", { class: "now-body" });
     if (cur) {
-      const a = iso(cur.from), b = iso(cur.to);
-      const pct = Math.min(100, ((today - a) / (b - a + DAY)) * 100);
-      const daysLeft = Math.round((b - today) / DAY);
+      const pct = Math.min(100, ((today - cur.a) / (cur.b - cur.a + DAY)) * 100);
+      const daysLeft = Math.round((cur.b - today) / DAY);
       body.append(
-        el("div", null, el("div", { class: "now-title", text: cur.name }), el("div", { class: "meta", text: fmtRange(a, b) + (parallel.length ? " · parallellt: " + parallel.map((p) => p.name).join(", ") : "") })),
-        el("div", null, el("div", { class: "bar-label" }, el("span", { text: "Placeringen" }), el("strong", { text: daysLeft + " dagar kvar" })), el("div", { class: "bar coral" }, el("span", { style: "width:" + pct + "%" }))),
+        el("div", null, el("div", { class: "now-title", text: cur.name }), el("div", { class: "meta", text: fmtRange(cur.a, cur.b) + (parallel.length ? " · parallellt: " + parallel.map((p) => p.name).join(", ") : "") })),
+        el("div", null, el("div", { class: "bar-label" }, el("span", { text: "Placeringen" }), el("strong", { text: daysLeft + " dagar kvar" })), el("div", { class: "bar alt" }, el("span", { style: "width:" + pct + "%" }))),
       );
     } else {
       body.append(el("div", { class: "now-title", text: today < st0 ? "ST har inte börjat" : today > st1 ? "ST klar" : "Mellan placeringar" }));
     }
     body.append(el("div", null, el("div", { class: "bar-label" }, el("span", { text: "Hela ST" }), el("strong", { text: "månad " + monthsDone + " av " + monthsTotal })), el("div", { class: "bar" }, el("span", { style: "width:" + stPct + "%" }))));
-    if (next) body.append(el("div", { class: "next-up" }, "Härnäst: ", el("strong", { text: next.name }), " från " + fmtDate(iso(next.from))));
+    if (next) body.append(el("div", { class: "next-up" }, "Härnäst: ", el("strong", { text: next.name }), " från " + fmtDate(next.a)));
     $("now-card").replaceChildren(el("div", { class: "now-top" }, el("span", { class: "eyebrow", text: "Just nu" }), el("span", { class: "pill", text: Math.round(stPct) + " % av ST" })), body);
+  }
 
-    renderTimeline($("timeline"));
+  /* ---------- Page: Översikt ---------- */
+  async function pageHome() {
+    // Visas direkt med inbyggd tidslinje, ersätts av arkets data när den laddats
+    renderNow(fallbackRots);
+    renderTimeline($("timeline"), fallbackRots);
+
 
     try {
       const [d, k, p, b] = await Promise.all(["delmal", "kurser", "placeringar", "bedomningar"].map(fetchSheet));
       const kurser = normItems(k, "kurs"), plac = normItems(p, "placering"), bed = normItems(b, "bedömning");
       const goals = normDelmal(d, kurser, plac);
+      const rots = rotsFromSheet(plac, kurser);
+      if (rots) { renderNow(rots); renderTimeline($("timeline"), rots); }
       const done = (xs) => xs.filter((x) => x.status === "completed").length;
       const covered = goals.filter((g) => g.covered).length;
       const stat = (href, num, total, label, sub) => el("a", { class: "stat", href },
@@ -326,17 +372,18 @@
       const f = getFilter(), term = q.value.trim().toLowerCase();
       const shown = items.filter((x) => (!f || (isRead ? x.typ === f : x.status === f)) &&
         (!term || [x.titel, x.ansvarig, x.forfattare, x.note, x.typ, x.delmal.join(" ")].join(" ").toLowerCase().includes(term)));
-      if (isRead) shown.sort((a, b) => (b.p ? +b.p.start : 0) - (a.p ? +a.p.start : 0));
+      if (isRead) shown.sort((a, b) => (b.p ? +b.p.start : 9e15) - (a.p ? +a.p.start : 9e15));
       if (!shown.length) return target.replaceChildren(el("p", { class: "notice", text: "Inget matchar sökningen." }));
       target.replaceChildren(...shown.map((x) => el("li", { class: "item " + (isRead ? "" : x.status) },
-        el("div", { class: "item-when" }, el("span", { class: "date", text: isRead ? (x.p ? fmtDate(x.p.start) : blank(x.raw)) : fmtPeriod(x.p, x.raw) }), isRead ? null : statusBadge(x.status)),
+        el("div", { class: "item-when" }, el("span", { class: "date", text: isRead ? (blank(x.raw) || "–") : fmtPeriod(x.p, x.raw) }), isRead ? null : statusBadge(x.status)),
         el("div", { class: "item-main" },
-          x.typ ? el("span", { class: "type", text: x.typ }) : null,
+          x.typ ? el("span", { class: "type-badge type-" + x.typ.toLowerCase().replace(/[^a-z0-9-]/g, ""), text: x.typ }) : null,
           el("span", { class: "item-title", text: x.titel }),
           (x.ansvarig || x.forfattare) ? el("span", { class: "item-sub", text: x.ansvarig || x.forfattare }) : null,
           x.delmal.length ? goalTags(x.delmal) : null,
-          x.note ? el("span", { class: "item-note", text: x.note }) : null),
-        x.lank ? el("a", { class: "btn btn-light item-link", href: x.lank, target: "_blank", rel: "noopener", text: isRead ? "Öppna ↗" : kind === "kurs" ? "Kursintyg ↗" : kind === "placering" ? "Intyg ↗" : "Dokument ↗" }) : null,
+          x.note ? el("span", { class: "item-note", text: x.note }) : null,
+          x.noCert ? el("span", { class: "nocert", text: "Intyg saknas" }) : null),
+        x.lank ? el("a", { class: "btn item-link", href: x.lank, target: "_blank", rel: "noopener", text: isRead ? "Öppna ↗" : kind === "kurs" ? "Kursintyg ↗" : kind === "placering" ? "Intyg ↗" : "Dokument ↗" }) : null,
       )));
     }
     draw();
@@ -356,7 +403,7 @@
       const gs = goals.filter((g) => g.kat === k), c = gs.filter((g) => g.covered).length;
       return el("div", { class: "progress-card" },
         el("div", { class: "bar-label" }, el("span", null, el("strong", { text: label }), " · " + sub), el("strong", { text: c + "/" + gs.length })),
-        el("div", { class: "bar" + (k === "b" ? " coral" : "") }, el("span", { style: "width:" + (gs.length ? (c / gs.length) * 100 : 0) + "%" })));
+        el("div", { class: "bar " + k }, el("span", { style: "width:" + (gs.length ? (c / gs.length) * 100 : 0) + "%" })));
     }));
 
     const q = $("q");
@@ -376,10 +423,11 @@
         const desc = g.beskrivning ? el("p", { class: "goal-desc" + (g.beskrivning.length > 220 ? " clamp" : ""), text: g.beskrivning }) : null;
         const more = desc && g.beskrivning.length > 220 ? el("button", { class: "more", type: "button", text: "Visa mer", onclick: (e) => { const open = desc.classList.toggle("clamp"); e.target.textContent = open ? "Visa mer" : "Visa mindre"; } }) : null;
         const cover = (label, xs) => xs.length ? el("div", { class: "cover" }, el("span", { class: "cover-label", text: label }), el("div", { class: "tags" }, xs.map((t) => el("span", { class: "tag", text: t })))) : null;
-        return el("article", { class: "goal" + (g.covered ? "" : " uncovered"), id: g.kod },
+        return el("article", { class: "goal cat-" + g.kat + (g.covered ? "" : " uncovered"), id: g.kod },
           el("div", { class: "goal-head" }, el("div", { class: "code " + g.kat, text: g.kod }), el("div", { class: "goal-title", text: g.titel })),
           desc, more,
           cover("Placeringar", g.placeringar), cover("Kurser", g.kurser),
+          g.noCourseReq && !g.kurser.length ? el("span", { class: "item-sub", text: "Inget kurskrav" }) : null,
           g.covered ? null : el("span", { class: "status planned", text: "Ej täckt ännu" }));
       }));
       if (location.hash) { const t = document.getElementById(location.hash.slice(1)); if (t) t.scrollIntoView(); }
@@ -388,6 +436,12 @@
   }
 
   /* ---------- Boot ---------- */
+  // Allt räknas från dagens datum; en flik som står öppen laddas om efter midnatt
+  const msToMidnight = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1, 0, 1) - new Date();
+  setTimeout(() => location.reload(), msToMidnight);
+  document.addEventListener("visibilitychange", () => {
+    if (!document.hidden && new Date().toDateString() !== today.toDateString()) location.reload();
+  });
   const nav = document.querySelector(".nav"), curLink = nav && nav.querySelector("[aria-current]");
   if (nav && curLink && nav.scrollWidth > nav.clientWidth) nav.scrollLeft = curLink.offsetLeft - (nav.clientWidth - curLink.offsetWidth) / 2;
   document.querySelectorAll("[data-refresh]").forEach((b) => b.addEventListener("click", refresh));
